@@ -19,7 +19,7 @@ def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick'):
     ))
 
 st.set_page_config(layout="wide")
-st.title("Building Survey: Final Accurate Digital Twin")
+st.title("Building Survey: Digital Twin")
 
 fig = go.Figure()
 
@@ -68,3 +68,4 @@ fig.update_layout(
 
 
 st.plotly_chart(fig, use_container_width=True)
+
