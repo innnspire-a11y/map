@@ -1,6 +1,21 @@
 import streamlit as st
 import plotly.graph_objects as go
 
+# --- 1. Page Configuration & UI Cleanup ---
+st.set_page_config(layout="wide", page_title="Digital Twin")
+
+# Custom CSS to hide the GitHub icon, Deploy button, and footer
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            .stAppDeployButton {display:none !important;}
+            div[data-testid="stToolbar"] {display: none !important;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', opacity=0.9):
     fig.add_trace(go.Mesh3d(
         x=[x_range[0], x_range[1], x_range[1], x_range[0], x_range[0], x_range[1], x_range[1], x_range[0]],
@@ -10,21 +25,20 @@ def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', 
         opacity=opacity, color=color, flatshading=True, name=name
     ))
 
-st.set_page_config(layout="wide")
 st.title("Digital Twin: Building")
 
 fig = go.Figure()
 
 # --- CONSTANTS ---
-T = 0.22               
-CEILING_H = 2.50       
-SLAB_TOP = 2.73        
-WEST_LIMIT_X = 4.84    
-EAST_LIMIT_X = -4.98   
-R3_Y_DIVIDE = 7.72   
+T = 0.22                
+CEILING_H = 2.50        
+SLAB_TOP = 2.73         
+WEST_LIMIT_X = 4.84     
+EAST_LIMIT_X = -4.98    
+R3_Y_DIVIDE = 7.72    
 R3_Y_END = R3_Y_DIVIDE + 3.35 
 R1_C, R2_C, R3_C, R4_C, R5_C = "royalblue", "firebrick", "darkgreen", "slategrey", "darkorange"
-G_C, G_O = "skyblue", 0.4 
+G_C, G_O = "skyblue", 0.4  
 ENT_C = "rgba(0, 255, 100, 0.4)" # Transparent Green for entrances
 
 # --- ROOM 5 VERTICAL DATUM ---
@@ -82,7 +96,6 @@ R4_X_RIGHT = 0.0
 R4_X_LEFT = R2_X_END         
 R4_Y_TOP = 2.42               
 R4_FLOOR = 0.77
-# Adjusted: Southern edge is now at y=5.0, translated North by T
 R4_Y_BOTTOM_EDGE = 5.0
 R4_Y_BOTTOM_START = R4_Y_BOTTOM_EDGE - T 
 
@@ -90,10 +103,7 @@ add_3d_wall(fig, [R4_X_LEFT, R4_X_RIGHT], [R4_Y_TOP, R4_Y_BOTTOM_EDGE], [R4_FLOO
 add_3d_wall(fig, [R4_X_LEFT, R4_X_RIGHT], [R4_Y_TOP, R4_Y_TOP+T], [R4_FLOOR, 2.5], "R4 North Shared Wall", R4_C)
 add_3d_wall(fig, [-T, 0], [R4_Y_TOP, R4_Y_BOTTOM_EDGE], [R4_FLOOR, 2.5], "R4 West Shared Wall (from R1)", R4_C)
 add_3d_wall(fig, [R4_X_LEFT-T, R4_X_LEFT], [R4_Y_TOP, R4_Y_BOTTOM_EDGE], [R4_FLOOR, 2.5], "R4 East Wall (aligned R2)", R4_C)
-
-# South wall now flush with the end of stairs (y=5.0)
 add_3d_wall(fig, [R4_X_LEFT + 0.82, R4_X_RIGHT], [R4_Y_BOTTOM_START, R4_Y_BOTTOM_EDGE], [R4_FLOOR, 2.5], "R4 South Wall", R4_C)
-# Room 4 Entrance Glass effect updated to new Y position
 add_3d_wall(fig, [R4_X_LEFT, R4_X_LEFT + 0.82], [R4_Y_BOTTOM_START + T/2, R4_Y_BOTTOM_START + T/2], [R4_FLOOR, 2.5], "R4 Entrance Glass", ENT_C)
 
 # --- 6. ROOM 5: THE HUB ---
@@ -104,7 +114,6 @@ add_3d_wall(fig, [R5_XW, R5_XE], [R5_YN, R5_YS], [R5_Z-0.05, R5_Z], "R5 Floor", 
 
 S_D_X_START = R5_XW - 0.49
 S_D_X_END = S_D_X_START - 0.89 
-
 NW_WIN_Z_SILL, NW_WIN_Z_HEAD = R5_Z + 1.72, R5_Z + 1.72 + 0.29
 NW_WIN_X_START = S_D_X_END - 0.335
 NW_WIN_X_END = NW_WIN_X_START - 1.0
@@ -138,9 +147,6 @@ add_3d_wall(fig, [S_W_X2, S_W_X1], [R5_YS, R5_YS+T], [R5_Z, S_WIN_Z_SILL], "R5 S
 add_3d_wall(fig, [S_W_X2, S_W_X1], [R5_YS, R5_YS+T], [S_WIN_Z_HEAD, R5_CEIL], "R5 S Win Header", R5_C)
 add_3d_wall(fig, [S_W_X1, R5_XE], [R5_YS, R5_YS+T], [R5_Z, R5_CEIL], "R5 S Wall E", R5_C)
 add_3d_wall(fig, [S_W_X2, S_W_X1], [R5_YS+T/2, R5_YS+T/2], [S_WIN_Z_SILL, S_WIN_Z_HEAD], "Glass R5 S", G_C, G_O)
-
-# West Shared Wall
-add_3d_wall(fig, [-T, 0], [R5_YN, R5_YS], [R5_Z, R5_CEIL], "R5 West Shared Wall", R5_C)
 
 # --- 7. INTERNAL PARTITION ---
 INT_X = S_D_X_END - 0.36
