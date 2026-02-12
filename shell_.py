@@ -6,16 +6,16 @@ st.set_page_config(layout="wide", page_title="Digital Twin")
 
 # --- 2. CSS UI cleanup ---
 hide_st_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
-            div[data-testid="stToolbar"] {display: none !important;}
-            .stAppDeployButton {display:none !important;}
-            div[data-testid="stDecoration"] {display:none !important;}
-            .block-container {padding-top: 0rem;}
-            </style>
-            """
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    div[data-testid="stToolbar"] {display: none !important;}
+    .stAppDeployButton {display:none !important;}
+    div[data-testid="stDecoration"] {display:none !important;}
+    .block-container {padding-top: 0rem;}
+    </style>
+"""
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', opacity=0.9):
@@ -27,32 +27,33 @@ def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', 
         opacity=opacity, color=color, flatshading=True, name=name
     ))
 
-st.title("Digital Twin: Building")
+st.title("Digital Twin: Building (Updated Slab + Upper over R2, R4, R5)")
 
 fig = go.Figure()
 
 # --- CONSTANTS ---
-T = 0.22                
-CEILING_H = 2.50        
-SLAB_TOP = 2.73         
-WEST_LIMIT_X = 4.84      
-EAST_LIMIT_X = -4.98    
-R3_Y_DIVIDE = 7.72    
-R3_Y_END = R3_Y_DIVIDE + 3.35 
+T = 0.22
+CEILING_H = 2.50
+SLAB_TOP = 2.73
+WEST_LIMIT_X = 4.84
+EAST_LIMIT_X = -4.98
+R3_Y_DIVIDE = 7.72
+R3_Y_END = R3_Y_DIVIDE + 3.35  # ≈ 11.07
 R1_C, R2_C, R3_C, R4_C, R5_C = "royalblue", "firebrick", "darkgreen", "slategrey", "darkorange"
-G_C, G_O = "skyblue", 0.4  
-ENT_C = "rgba(0, 255, 100, 0.4)" 
+TAB_C = "plum"
+G_C, G_O = "skyblue", 0.4
+ENT_C = "rgba(0, 255, 100, 0.4)"
 
 # --- ROOM 5 VERTICAL DATUM ---
-R5_Z = 0.45 
-R5_CEIL = CEILING_H 
+R5_Z = 0.45
+R5_CEIL = CEILING_H
 
 # --- 1. ROOM 1: MAIN HALL ---
 add_3d_wall(fig, [0, WEST_LIMIT_X], [-T, 0], [0, CEILING_H], "R1 North Wall", R1_C)
 
 # Room 1 West Wall Features
 add_3d_wall(fig, [-T, 0], [0, 1.15], [0, CEILING_H], "West Pillar 1", R1_C)
-add_3d_wall(fig, [-T, 0], [1.15, 2.11], [2.06, CEILING_H], "West Door Header 1", R1_C) 
+add_3d_wall(fig, [-T, 0], [1.15, 2.11], [2.06, CEILING_H], "West Door Header 1", R1_C)
 add_3d_wall(fig, [-T/2, -T/2], [1.15, 2.11], [0, 2.06], "Entrance 1 Glass", ENT_C)
 add_3d_wall(fig, [-T, 0], [2.11, 5.20], [0, CEILING_H], "West Mid Wall", R1_C)
 add_3d_wall(fig, [-T, 0], [5.20, 6.01], [2.09, CEILING_H], "West Door Header 2", R1_C)
@@ -60,12 +61,12 @@ add_3d_wall(fig, [-T/2, -T/2], [5.20, 6.01], [0, 2.09], "Entrance 2 Glass", ENT_
 add_3d_wall(fig, [-T, 0], [6.01, R3_Y_DIVIDE], [0, CEILING_H], "West Pillar 2", R1_C)
 
 # Room 1 South Dividers
-add_3d_wall(fig, [0, 1.96], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [0, CEILING_H], "R1 South Divider E", R1_C) 
+add_3d_wall(fig, [0, 1.96], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [0, CEILING_H], "R1 South Divider E", R1_C)
 add_3d_wall(fig, [1.96, 2.77], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [2.09, CEILING_H], "R1 South Door Header", R1_C)
 add_3d_wall(fig, [1.96, 2.77], [R3_Y_DIVIDE+T/2, R3_Y_DIVIDE+T/2], [0, 2.09], "Entrance South Glass", ENT_C)
 add_3d_wall(fig, [2.77, WEST_LIMIT_X], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [0, CEILING_H], "R1 South Divider W", R1_C)
 
-# --- 2. EQUALLY DISTRIBUTED HOLLOW PILLARS (P3 Translated 43cm South) ---
+# --- 2. HOLLOW PILLARS (Cut at Bottom of Slab) ---
 P_DEPTH = 0.50
 P_WIDTH = 0.63
 SPAN_START = -T
@@ -76,20 +77,17 @@ P_X_OUT = WEST_LIMIT_X + P_DEPTH
 gap = (TOTAL_SPAN_LENGTH - (4 * P_WIDTH)) / 3
 
 pillar_starts = [
-    SPAN_START,                       # P1: North Edge
-    SPAN_START + P_WIDTH + gap,       # P2
-    SPAN_START + 2 * (P_WIDTH + gap) + 0.43, # P3: Translated 43cm South
-    SPAN_END - P_WIDTH                # P4: South Edge
+    SPAN_START,
+    SPAN_START + P_WIDTH + gap,
+    SPAN_START + 2 * (P_WIDTH + gap) + 0.43,
+    SPAN_END - P_WIDTH
 ]
 
 for i, y_start in enumerate(pillar_starts):
     y_end = y_start + P_WIDTH
-    # South face
-    add_3d_wall(fig, [WEST_LIMIT_X, P_X_OUT], [y_start, y_start+0.02], [0, SLAB_TOP], f"Hollow P{i+1} S", "gray")
-    # West face
-    add_3d_wall(fig, [P_X_OUT-0.02, P_X_OUT], [y_start, y_end], [0, SLAB_TOP], f"Hollow P{i+1} W", "gray")
-    # North face
-    add_3d_wall(fig, [WEST_LIMIT_X, P_X_OUT], [y_end-0.02, y_end], [0, SLAB_TOP], f"Hollow P{i+1} N", "gray")
+    add_3d_wall(fig, [WEST_LIMIT_X, P_X_OUT], [y_start, y_start+0.02], [0, CEILING_H], f"Hollow P{i+1} S", "gray")
+    add_3d_wall(fig, [P_X_OUT-0.02, P_X_OUT], [y_start, y_end], [0, CEILING_H], f"Hollow P{i+1} W", "gray")
+    add_3d_wall(fig, [WEST_LIMIT_X, P_X_OUT], [y_end-0.02, y_end], [0, CEILING_H], f"Hollow P{i+1} N", "gray")
 
 # --- 3. WESTERN COLONNADE ---
 add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [0, 0.90], [0, CEILING_H], "West Corner Pillar", R1_C)
@@ -102,7 +100,7 @@ R2_X_END = -1.79
 add_3d_wall(fig, [-0.62, 0], [-T, 0], [0, CEILING_H], "R2 N Pillar", R2_C)
 add_3d_wall(fig, [-1.325, -0.62], [-T, 0], [0, 1.46], "R2 N Sill", R2_C)
 add_3d_wall(fig, [-1.325, -0.62], [-T, 0], [2.06, CEILING_H], "R2 N Header", R2_C)
-add_3d_wall(fig, [-1.325, -0.62], [-T/2, -T/2], [1.46, 2.06], "Glass R2 N", G_C, G_O) 
+add_3d_wall(fig, [-1.325, -0.62], [-T/2, -T/2], [1.46, 2.06], "Glass R2 N", G_C, G_O)
 add_3d_wall(fig, [R2_X_END, -1.325], [-T, 0], [0, CEILING_H], "R2 N End", R2_C)
 add_3d_wall(fig, [R2_X_END-T, R2_X_END], [-T, 2.42], [0, CEILING_H], "R2 East Wall", R2_C)
 add_3d_wall(fig, [R2_X_END, 0], [2.42, 2.42+T], [0, CEILING_H], "R2 South Shared Wall", R2_C)
@@ -125,11 +123,11 @@ add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [R3_Y_DIVIDE+2.71, R3_Y_END], [
 
 # --- 6. ROOM 4: THE ENCLOSED MEZZANINE ---
 R4_X_RIGHT = 0.0
-R4_X_LEFT = R2_X_END          
-R4_Y_TOP = 2.42                
+R4_X_LEFT = R2_X_END
+R4_Y_TOP = 2.42
 R4_FLOOR = 0.77
 R4_Y_BOTTOM_EDGE = 5.0
-R4_Y_BOTTOM_START = R4_Y_BOTTOM_EDGE - T 
+R4_Y_BOTTOM_START = R4_Y_BOTTOM_EDGE - T
 
 add_3d_wall(fig, [R4_X_LEFT, R4_X_RIGHT], [R4_Y_TOP, R4_Y_BOTTOM_EDGE], [R4_FLOOR, R4_FLOOR+0.05], "R4 Floor", R4_C)
 add_3d_wall(fig, [R4_X_LEFT, R4_X_RIGHT], [R4_Y_TOP, R4_Y_TOP+T], [R4_FLOOR, 2.5], "R4 North Shared Wall", R4_C)
@@ -141,25 +139,25 @@ add_3d_wall(fig, [R4_X_LEFT, R4_X_LEFT + 0.82], [R4_Y_BOTTOM_START + T/2, R4_Y_B
 # --- 7. ROOM 5: THE HUB ---
 R5_XW, R5_XE = -T, -T - 3.75
 R5_YN = 6.46
-R5_YS = R3_Y_END 
+R5_YS = R3_Y_END
 add_3d_wall(fig, [R5_XW, R5_XE], [R5_YN, R5_YS], [R5_Z-0.05, R5_Z], "R5 Floor", "tan")
 
 S_D_X_START = R5_XW - 0.49
-S_D_X_END = S_D_X_START - 0.89 
+S_D_X_END = S_D_X_START - 0.89
 NW_WIN_Z_SILL, NW_WIN_Z_HEAD = R5_Z + 1.72, R5_Z + 1.72 + 0.29
 NW_WIN_X_START = S_D_X_END - 0.335
 NW_WIN_X_END = NW_WIN_X_START - 1.0
 
 add_3d_wall(fig, [R5_XW, S_D_X_START], [R5_YN, R5_YN+T], [R5_Z, R5_CEIL], "R5 N Wall W", R5_C)
 add_3d_wall(fig, [S_D_X_START, S_D_X_END], [R5_YN, R5_YN+T], [R5_Z+2.03, R5_CEIL], "R5 N Door Header", R5_C)
-add_3d_wall(fig, [S_D_X_START, S_D_X_END], [R5_YN+T/2, R5_YN+T/2], [R5_Z, R5_Z+2.03], "Entrance R5 N Glass", ENT_C) 
+add_3d_wall(fig, [S_D_X_START, S_D_X_END], [R5_YN+T/2, R5_YN+T/2], [R5_Z, R5_Z+2.03], "Entrance R5 N Glass", ENT_C)
 add_3d_wall(fig, [S_D_X_END, NW_WIN_X_START], [R5_YN, R5_YN+T], [R5_Z, R5_CEIL], "R5 N Wall Mid", R5_C)
 add_3d_wall(fig, [NW_WIN_X_START, NW_WIN_X_END], [R5_YN, R5_YN+T], [R5_Z, NW_WIN_Z_SILL], "R5 N Win Sill", R5_C)
 add_3d_wall(fig, [NW_WIN_X_START, NW_WIN_X_END], [R5_YN, R5_YN+T], [NW_WIN_Z_HEAD, R5_CEIL], "R5 N Win Header", R5_C)
 add_3d_wall(fig, [NW_WIN_X_END, R5_XE], [R5_YN, R5_YN+T], [R5_Z, R5_CEIL], "R5 N Wall E", R5_C)
 add_3d_wall(fig, [NW_WIN_X_START, NW_WIN_X_END], [R5_YN+T/2, R5_YN+T/2], [NW_WIN_Z_SILL, NW_WIN_Z_HEAD], "Glass R5 N", G_C, G_O)
 
-# Room 5 East Wall 
+# Room 5 East Wall
 E_W_Y1, E_W_Y2 = R5_YN + 0.70, R5_YN + 1.68
 E_WIN_Z_SILL, E_WIN_Z_HEAD = R5_Z + 1.22, R5_Z + 1.22 + 0.79
 add_3d_wall(fig, [R5_XE, R5_XE+T], [R5_YN, E_W_Y1], [R5_Z, R5_CEIL], "R5 E Wall N", R5_C)
@@ -202,8 +200,40 @@ for i, (r, d) in enumerate([(0.19, 0.24), (0.21, 0.4), (0.19, 0.4), (0.18, 0.39)
     add_3d_wall(fig, [curr_x - d, curr_x], [5.0, 6.4], [0, curr_z + r], f"Stair {i+1}", "silver")
     curr_z += r; curr_x -= d
 
-# Slab logic
-add_3d_wall(fig, [EAST_LIMIT_X-2, WEST_LIMIT_X+2], [-T, R5_YS+T], [CEILING_H, SLAB_TOP], "Concrete Slab", "rgba(100,100,100,0.2)")
+# --- CONCRETE SLAB (adjusted: flush N/S/W, no coverage east of ~R2/R4, no slab over stairs) ---
+SLAB_X_EAST_EDGE = -0.8   # just east of R2/R4 zone, before open stair area
+SLAB_Y_SOUTH_EDGE = R3_Y_END + T
+SLAB_Y_NORTH_EDGE = -T
 
-fig.update_layout(scene=dict(aspectmode='data'), margin=dict(l=0, r=0, b=0, t=50))
+add_3d_wall(fig,
+    [SLAB_X_EAST_EDGE, WEST_LIMIT_X + T],
+    [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE],
+    [CEILING_H, SLAB_TOP],
+    "Concrete Slab (trimmed)",
+    "rgba(100,100,100,0.25)"
+)
+
+# --- 10. UPPER FLOOR ROOMS (on top of slab - extended over R2, R4, R5 areas) ---
+TAB_Z_START = SLAB_TOP
+TAB_Z_END = TAB_Z_START + 2.50
+
+# Outer walls - extended to cover R2/R4/R5 footprint
+add_3d_wall(fig, [SLAB_X_EAST_EDGE, WEST_LIMIT_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_NORTH_EDGE+T], [TAB_Z_START, TAB_Z_END], "Upper North Outer Wall", TAB_C)
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "Upper West Outer Wall", TAB_C)
+add_3d_wall(fig, [SLAB_X_EAST_EDGE, WEST_LIMIT_X], [SLAB_Y_SOUTH_EDGE-T, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "Upper South Outer Wall", TAB_C)
+add_3d_wall(fig, [SLAB_X_EAST_EDGE-T, SLAB_X_EAST_EDGE], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "Upper East Outer Wall (over R2/R5)", TAB_C)
+
+# Example interior divisions (can be customized further)
+add_3d_wall(fig, [0.5, 0.5+T], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "Upper Main Splitter (N-S)", TAB_C)
+add_3d_wall(fig, [SLAB_X_EAST_EDGE, 1.5], [R4_Y_TOP-0.5, R4_Y_TOP-0.5+T], [TAB_Z_START, TAB_Z_END], "Upper Divider above R4", TAB_C)
+add_3d_wall(fig, [SLAB_X_EAST_EDGE, -1.0], [R5_YN-0.5, R5_YN-0.5+T], [TAB_Z_START + 0.4, TAB_Z_END], "Upper Door Header (example)", TAB_C)
+
+fig.update_layout(
+    scene=dict(
+        aspectmode='data',
+        camera=dict(eye=dict(x=2.0, y=-2.5, z=1.2))
+    ),
+    margin=dict(l=0, r=0, b=0, t=50)
+)
+
 st.plotly_chart(fig, use_container_width=True)
