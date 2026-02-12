@@ -16,11 +16,11 @@ st.title("Digital Twin: Building")
 fig = go.Figure()
 
 # --- CONSTANTS ---
-T = 0.22              
-CEILING_H = 2.50      
-SLAB_TOP = 2.73       
-WEST_LIMIT_X = 4.84   
-EAST_LIMIT_X = -4.98  
+T = 0.22               
+CEILING_H = 2.50       
+SLAB_TOP = 2.73        
+WEST_LIMIT_X = 4.84    
+EAST_LIMIT_X = -4.98   
 R3_Y_DIVIDE = 7.72   
 R3_Y_END = R3_Y_DIVIDE + 3.35 
 R1_C, R2_C, R3_C, R4_C, R5_C = "royalblue", "firebrick", "darkgreen", "slategrey", "darkorange"
@@ -80,18 +80,21 @@ add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [R3_Y_DIVIDE+2.71, R3_Y_END], [
 # --- 5. ROOM 4: THE ENCLOSED MEZZANINE ---
 R4_X_RIGHT = 0.0
 R4_X_LEFT = R2_X_END         
-R4_Y_BOTTOM = 5.0             
 R4_Y_TOP = 2.42               
 R4_FLOOR = 0.77
+# Adjusted: Southern edge is now at y=5.0, translated North by T
+R4_Y_BOTTOM_EDGE = 5.0
+R4_Y_BOTTOM_START = R4_Y_BOTTOM_EDGE - T 
 
-add_3d_wall(fig, [R4_X_LEFT, R4_X_RIGHT], [R4_Y_TOP, R4_Y_BOTTOM], [R4_FLOOR, R4_FLOOR+0.05], "R4 Floor", R4_C)
+add_3d_wall(fig, [R4_X_LEFT, R4_X_RIGHT], [R4_Y_TOP, R4_Y_BOTTOM_EDGE], [R4_FLOOR, R4_FLOOR+0.05], "R4 Floor", R4_C)
 add_3d_wall(fig, [R4_X_LEFT, R4_X_RIGHT], [R4_Y_TOP, R4_Y_TOP+T], [R4_FLOOR, 2.5], "R4 North Shared Wall", R4_C)
-add_3d_wall(fig, [-T, 0], [R4_Y_TOP, R4_Y_BOTTOM], [R4_FLOOR, 2.5], "R4 West Shared Wall (from R1)", R4_C)
-add_3d_wall(fig, [R4_X_LEFT-T, R4_X_LEFT], [R4_Y_TOP, R4_Y_BOTTOM], [R4_FLOOR, 2.5], "R4 East Wall (aligned R2)", R4_C)
-# South wall with opening (doorway)
-add_3d_wall(fig, [R4_X_LEFT + 0.82, R4_X_RIGHT], [R4_Y_BOTTOM, R4_Y_BOTTOM+T], [R4_FLOOR, 2.5], "R4 South Wall", R4_C)
-# Room 4 Entrance Glass effect
-add_3d_wall(fig, [R4_X_LEFT, R4_X_LEFT + 0.82], [R4_Y_BOTTOM+T/2, R4_Y_BOTTOM+T/2], [R4_FLOOR, 2.5], "R4 Entrance Glass", ENT_C)
+add_3d_wall(fig, [-T, 0], [R4_Y_TOP, R4_Y_BOTTOM_EDGE], [R4_FLOOR, 2.5], "R4 West Shared Wall (from R1)", R4_C)
+add_3d_wall(fig, [R4_X_LEFT-T, R4_X_LEFT], [R4_Y_TOP, R4_Y_BOTTOM_EDGE], [R4_FLOOR, 2.5], "R4 East Wall (aligned R2)", R4_C)
+
+# South wall now flush with the end of stairs (y=5.0)
+add_3d_wall(fig, [R4_X_LEFT + 0.82, R4_X_RIGHT], [R4_Y_BOTTOM_START, R4_Y_BOTTOM_EDGE], [R4_FLOOR, 2.5], "R4 South Wall", R4_C)
+# Room 4 Entrance Glass effect updated to new Y position
+add_3d_wall(fig, [R4_X_LEFT, R4_X_LEFT + 0.82], [R4_Y_BOTTOM_START + T/2, R4_Y_BOTTOM_START + T/2], [R4_FLOOR, 2.5], "R4 Entrance Glass", ENT_C)
 
 # --- 6. ROOM 5: THE HUB ---
 R5_XW, R5_XE = -T, -T - 3.75
