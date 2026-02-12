@@ -1,17 +1,23 @@
 import streamlit as st
 import plotly.graph_objects as go
 
-# --- 1. Page Configuration & UI Cleanup ---
+# --- 1. Page Configuration (Must be the first Streamlit command) ---
 st.set_page_config(layout="wide", page_title="Digital Twin")
 
-# Custom CSS to hide the GitHub icon, Deploy button, and footer
+# --- 2. Enhanced CSS to hide all GitHub/Streamlit UI clutter ---
 hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
             header {visibility: hidden;}
-            .stAppDeployButton {display:none !important;}
+            /* Hides the toolbar (GitHub, Manage App) */
             div[data-testid="stToolbar"] {display: none !important;}
+            /* Hides the 'Deploy' button specifically */
+            .stAppDeployButton {display:none !important;}
+            /* Hides the decoration line at the top */
+            div[data-testid="stDecoration"] {display:none !important;}
+            /* Removes extra top whitespace for a flush look */
+            .block-container {padding-top: 0rem;}
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
@@ -174,3 +180,4 @@ add_3d_wall(fig, [EAST_LIMIT_X-2, WEST_LIMIT_X+2], [-T, R5_YS+T], [CEILING_H, SL
 
 fig.update_layout(scene=dict(aspectmode='data'), margin=dict(l=0, r=0, b=0, t=50))
 st.plotly_chart(fig, use_container_width=True)
+
