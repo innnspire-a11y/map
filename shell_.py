@@ -27,7 +27,7 @@ def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', 
         opacity=opacity, color=color, flatshading=True, name=name
     ))
 
-st.title("Digital Twin: Building (Updated Slab + Upper over R2, R4, R5)")
+st.title("Digital Twin: Building ")
 
 fig = go.Figure()
 
@@ -237,3 +237,4 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
