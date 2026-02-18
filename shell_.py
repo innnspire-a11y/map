@@ -59,12 +59,10 @@ BATH_C = "lightseagreen"
 R5_Z = 0.45
 R5_CEIL = CEILING_H
 
-R5_XW, R5_XE = -T, -T - 3.75   # ≈ -0.22 to -3.97
+R5_XW, R5_XE = -T, -T - 3.75   # eastern edge = -3.97
 
 # --- 1. ROOM 1: MAIN HALL ---
 add_3d_wall(fig, [0, WEST_LIMIT_X], [-T, 0], [0, CEILING_H], "R1 North Wall", R1_C)
-
-# Room 1 West Wall Features
 add_3d_wall(fig, [-T, 0], [0, 1.15], [0, CEILING_H], "West Pillar 1", R1_C)
 add_3d_wall(fig, [-T, 0], [1.15, 2.11], [2.06, CEILING_H], "West Door Header 1", R1_C)
 add_3d_wall(fig, [-T/2, -T/2], [1.15, 2.11], [0, 2.06], "Entrance 1 Glass", ENT_C)
@@ -72,30 +70,25 @@ add_3d_wall(fig, [-T, 0], [2.11, 5.20], [0, CEILING_H], "West Mid Wall", R1_C)
 add_3d_wall(fig, [-T, 0], [5.20, 6.01], [2.09, CEILING_H], "West Door Header 2", R1_C)
 add_3d_wall(fig, [-T/2, -T/2], [5.20, 6.01], [0, 2.09], "Entrance 2 Glass", ENT_C)
 add_3d_wall(fig, [-T, 0], [6.01, R3_Y_DIVIDE], [0, CEILING_H], "West Pillar 2", R1_C)
-
-# Room 1 South Dividers
 add_3d_wall(fig, [0, 1.96], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [0, CEILING_H], "R1 South Divider E", R1_C)
 add_3d_wall(fig, [1.96, 2.77], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [2.09, CEILING_H], "R1 South Door Header", R1_C)
 add_3d_wall(fig, [1.96, 2.77], [R3_Y_DIVIDE+T/2, R3_Y_DIVIDE+T/2], [0, 2.09], "Entrance South Glass", ENT_C)
 add_3d_wall(fig, [2.77, WEST_LIMIT_X], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [0, CEILING_H], "R1 South Divider W", R1_C)
 
-# --- 2. HOLLOW PILLARS (Cut at Bottom of Slab) ---
+# --- 2. HOLLOW PILLARS ---
 P_DEPTH = 0.50
 P_WIDTH = 0.63
 SPAN_START = -T
 SPAN_END = R3_Y_END + T
 TOTAL_SPAN_LENGTH = SPAN_END - SPAN_START
 P_X_OUT = WEST_LIMIT_X + P_DEPTH
-
 gap = (TOTAL_SPAN_LENGTH - (4 * P_WIDTH)) / 3
-
 pillar_starts = [
     SPAN_START,
     SPAN_START + P_WIDTH + gap,
     SPAN_START + 2 * (P_WIDTH + gap) + 0.43,
     SPAN_END - P_WIDTH
 ]
-
 for i, y_start in enumerate(pillar_starts):
     y_end = y_start + P_WIDTH
     add_3d_wall(fig, [WEST_LIMIT_X, P_X_OUT], [y_start, y_start+0.02], [0, CEILING_H], f"Hollow P{i+1} S", "gray")
@@ -242,19 +235,19 @@ HALL_START_X   = 0.00
 HALL_WIDTH     = 2.00
 HALL_END_X     = HALL_START_X + HALL_WIDTH
 
-# North wall of first floor now matches length of Room 2 north wall
+# North wall of first floor matches length of Room 2 north wall
 FF_NORTH_X_START = R2_X_END     # -1.79
 FF_NORTH_X_END   = WEST_LIMIT_X # 4.84
 
-FF_EAST_X = R5_XE               # easternmost allowed (over Room 5 only)
+FF_EAST_X = R5_XE               # NOTHING goes east of this line
 
 # Outer walls
 add_3d_wall(fig, [FF_NORTH_X_START, FF_NORTH_X_END], [SLAB_Y_NORTH_EDGE, SLAB_Y_NORTH_EDGE+T], [TAB_Z_START, TAB_Z_END], "FF North Outer (same length as R2 north)", TAB_C)
 add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF West Outer", TAB_C)
 add_3d_wall(fig, [FF_EAST_X, WEST_LIMIT_X], [SLAB_Y_SOUTH_EDGE-T, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF South Outer", TAB_C)
-add_3d_wall(fig, [FF_EAST_X-T, FF_EAST_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF East Outer (over R5)", TAB_C)
+add_3d_wall(fig, [FF_EAST_X-T, FF_EAST_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF East Outer (over R5 only)", TAB_C)
 
-# Perpendicular connection at the eastern end of FF North
+# Perpendicular connection at eastern end of north wall
 add_3d_wall(fig, [FF_NORTH_X_START - T, FF_NORTH_X_START], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF North-East Perpendicular Wall", TAB_C)
 
 # Hallway floor
@@ -278,9 +271,9 @@ for i in range(4):
     door_mid = (ys + ye) / 2
     add_3d_wall(fig, [HALL_START_X - T, HALL_START_X], [door_mid-0.45, door_mid+0.45], [TAB_Z_START+0.1, TAB_Z_START+2.1], f"{room_name} Door", ENT_C)
 
-# Kitchen + utility area ends exactly at Room 5's east wall (R5_XE)
-UTIL_XW = -1.79                 # starts at east edge of Room 2/4
-UTIL_XE = R5_XE                 # ends precisely at Room 5 east wall
+# Kitchen + utility area — strictly ends at Room 5 east wall (x = -3.97)
+UTIL_XW = -1.79
+UTIL_XE = R5_XE                 # <--- enforced boundary: nothing east of this
 UTIL_YS = SLAB_Y_SOUTH_EDGE - 5.5
 UTIL_YE = SLAB_Y_SOUTH_EDGE
 
@@ -300,7 +293,7 @@ add_3d_wall(fig, [UTIL_XW + 2.5, UTIL_XE - 0.5], [PART_Y + 0.5, PART_Y + 2.5], [
 add_3d_wall(fig, [HALL_END_X - T, HALL_END_X], [UTIL_YS + 1.0, UTIL_YS + 2.5], [TAB_Z_START+0.1, TAB_Z_START+2.1], "Kitchen Door", ENT_C)
 add_3d_wall(fig, [HALL_END_X - T, HALL_END_X], [PART_Y + 0.5, PART_Y + 1.8], [TAB_Z_START+0.1, TAB_Z_START+2.1], "Bathroom Door", ENT_C)
 
-# --- Stair continuation (unchanged) ---
+# --- Stair continuation ---
 stair_z_start = TAB_Z_START - 0.3
 curr_z = stair_z_start
 curr_x = -1.1
