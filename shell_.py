@@ -19,7 +19,7 @@ hide_st_style = """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', opacity=0.9):
-    # Force sorted ranges to prevent degenerate/invisible meshes
+    # Force sorted ranges to prevent degenerate meshes
     x_min, x_max = min(x_range), max(x_range)
     y_min, y_max = min(y_range), max(y_range)
     z_min, z_max = min(z_range), max(z_range)
@@ -62,6 +62,7 @@ R5_CEIL = CEILING_H
 
 # --- 1. ROOM 1: MAIN HALL ---
 add_3d_wall(fig, [0, WEST_LIMIT_X], [-T, 0], [0, CEILING_H], "R1 North Wall", R1_C)
+
 add_3d_wall(fig, [-T, 0], [0, 1.15], [0, CEILING_H], "West Pillar 1", R1_C)
 add_3d_wall(fig, [-T, 0], [1.15, 2.11], [2.06, CEILING_H], "West Door Header 1", R1_C)
 add_3d_wall(fig, [-T/2, -T/2], [1.15, 2.11], [0, 2.06], "Entrance 1 Glass", ENT_C)
@@ -69,6 +70,7 @@ add_3d_wall(fig, [-T, 0], [2.11, 5.20], [0, CEILING_H], "West Mid Wall", R1_C)
 add_3d_wall(fig, [-T, 0], [5.20, 6.01], [2.09, CEILING_H], "West Door Header 2", R1_C)
 add_3d_wall(fig, [-T/2, -T/2], [5.20, 6.01], [0, 2.09], "Entrance 2 Glass", ENT_C)
 add_3d_wall(fig, [-T, 0], [6.01, R3_Y_DIVIDE], [0, CEILING_H], "West Pillar 2", R1_C)
+
 add_3d_wall(fig, [0, 1.96], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [0, CEILING_H], "R1 South Divider E", R1_C)
 add_3d_wall(fig, [1.96, 2.77], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [2.09, CEILING_H], "R1 South Door Header", R1_C)
 add_3d_wall(fig, [1.96, 2.77], [R3_Y_DIVIDE+T/2, R3_Y_DIVIDE+T/2], [0, 2.09], "Entrance South Glass", ENT_C)
@@ -81,13 +83,16 @@ SPAN_START = -T
 SPAN_END = R3_Y_END + T
 TOTAL_SPAN_LENGTH = SPAN_END - SPAN_START
 P_X_OUT = WEST_LIMIT_X + P_DEPTH
+
 gap = (TOTAL_SPAN_LENGTH - (4 * P_WIDTH)) / 3
+
 pillar_starts = [
     SPAN_START,
     SPAN_START + P_WIDTH + gap,
     SPAN_START + 2 * (P_WIDTH + gap) + 0.43,
     SPAN_END - P_WIDTH
 ]
+
 for i, y_start in enumerate(pillar_starts):
     y_end = y_start + P_WIDTH
     add_3d_wall(fig, [WEST_LIMIT_X, P_X_OUT], [y_start, y_start+0.02], [0, CEILING_H], f"Hollow P{i+1} S", "gray")
@@ -196,7 +201,7 @@ add_3d_wall(fig, [W_INT_X1, W_INT_X2], [INT_Y3, INT_Y3+0.05], [I_WIN_Z_HEAD, R5_
 add_3d_wall(fig, [W_INT_X2, R5_XE], [INT_Y3, INT_Y3+0.05], [R5_Z, R5_CEIL], "Int Horiz 2", "silver")
 add_3d_wall(fig, [W_INT_X1, W_INT_X2], [INT_Y3+0.025, INT_Y3+0.025], [I_WIN_Z_SILL, I_WIN_Z_HEAD], "Glass Int", G_C, G_O)
 
-# --- 9. STEPS & STAIRCASE (GROUND) ---
+# --- 9. STEPS & STAIRCASE ---
 add_3d_wall(fig, [-2.1, -1.1], [5.0, 6.4], [0, 0.45], "Step 2 (R5 Base)", "silver")
 curr_z, curr_x = 0.32, -1.1
 for i, (r, d) in enumerate([(0.19, 0.24), (0.21, 0.4), (0.19, 0.4), (0.18, 0.39), (0.18, 0.39), (0.18, 0.4), (0.18, 0.4), (0.18, 0.415)]):
@@ -217,7 +222,7 @@ add_3d_wall(fig,
     "rgba(100,100,100,0.25)"
 )
 
-# --- 10. FIRST FLOOR (4 rooms + kitchen + bathroom) ---
+# --- 10. FIRST FLOOR (supported area only: x ≥ -1.79) ---
 
 TAB_Z_START = SLAB_TOP          # ≈ 2.73
 TAB_Z_END   = TAB_Z_START + 2.50
@@ -226,7 +231,7 @@ HALL_START_X   = 0.00
 HALL_WIDTH     = 2.00
 HALL_END_X     = HALL_START_X + HALL_WIDTH
 
-EAST_WALL_X    = -1.79          # aligned with R2/R4 east
+EAST_WALL_X    = -1.79          # strict eastern boundary
 
 # Outer walls
 add_3d_wall(fig, [EAST_WALL_X, WEST_LIMIT_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_NORTH_EDGE+T], [TAB_Z_START, TAB_Z_END], "FF North Outer", TAB_C)
@@ -237,7 +242,7 @@ add_3d_wall(fig, [EAST_WALL_X-T, EAST_WALL_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_
 # Hallway floor
 add_3d_wall(fig, [HALL_START_X, HALL_END_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_START+0.05], "FF Hallway Floor", "lightgray")
 
-# Four tenant rooms (west of hallway)
+# Four tenant rooms west of hallway
 y_dividers = [
     SLAB_Y_NORTH_EDGE,
     SLAB_Y_NORTH_EDGE + (SLAB_Y_SOUTH_EDGE - SLAB_Y_NORTH_EDGE)/4,
@@ -255,40 +260,34 @@ for i in range(4):
     door_mid = (ys + ye) / 2
     add_3d_wall(fig, [HALL_START_X - T, HALL_START_X], [door_mid-0.45, door_mid+0.45], [TAB_Z_START+0.1, TAB_Z_START+2.1], f"{room_name} Door", ENT_C)
 
-# Kitchen (east side, middle-south)
-KITCHEN_XW = -1.79
-KITCHEN_XE = -3.5
-KITCHEN_YS = SLAB_Y_NORTH_EDGE + (SLAB_Y_SOUTH_EDGE - SLAB_Y_NORTH_EDGE) * 0.55
-KITCHEN_YE = SLAB_Y_SOUTH_EDGE
+# Shared kitchen + bathroom — placed east of hallway but still west of x = -1.79
+UTIL_XW = EAST_WALL_X           # -1.79
+UTIL_XE = HALL_START_X          # 0.0
+UTIL_YS = SLAB_Y_SOUTH_EDGE - 4.5   # southern zone, adjust if needed
+UTIL_YE = SLAB_Y_SOUTH_EDGE
 
-add_3d_wall(fig, [KITCHEN_XW, KITCHEN_XE], [KITCHEN_YS, KITCHEN_YE], [TAB_Z_START, TAB_Z_END], "Kitchen North Wall", KITCHEN_C)
-add_3d_wall(fig, [KITCHEN_XW, KITCHEN_XE], [KITCHEN_YS, KITCHEN_YE], [TAB_Z_START, TAB_Z_START+0.05], "Kitchen Floor", "sandybrown")
-add_3d_wall(fig, [KITCHEN_XE, KITCHEN_XE + T], [KITCHEN_YS, KITCHEN_YE], [TAB_Z_START, TAB_Z_END], "Kitchen East Wall", KITCHEN_C)   # note +T direction
-add_3d_wall(fig, [KITCHEN_XW, KITCHEN_XE], [KITCHEN_YS - T, KITCHEN_YS], [TAB_Z_START, TAB_Z_END], "Kitchen South Wall", KITCHEN_C)
+# Utility block walls
+add_3d_wall(fig, [UTIL_XW, UTIL_XE], [UTIL_YS, UTIL_YE], [TAB_Z_START, TAB_Z_END], "Utility North Wall", "gray")
+add_3d_wall(fig, [UTIL_XW, UTIL_XE], [UTIL_YS, UTIL_YE], [TAB_Z_START, TAB_Z_START+0.05], "Utility Floor", "lightgray")
+add_3d_wall(fig, [UTIL_XE - T, UTIL_XE], [UTIL_YS, UTIL_YE], [TAB_Z_START, TAB_Z_END], "Utility East Wall (hall side)", TAB_C)
+add_3d_wall(fig, [UTIL_XW, UTIL_XE], [UTIL_YE - T, UTIL_YE], [TAB_Z_START, TAB_Z_END], "Utility South Wall", "gray")
 
-add_3d_wall(fig, [HALL_END_X - T, HALL_END_X], [KITCHEN_YS + 1.0, KITCHEN_YS + 2.2], [TAB_Z_START+0.1, TAB_Z_START+2.1], "Kitchen Door", ENT_C)
+# Split kitchen (south) / bathroom (north)
+PART_Y = UTIL_YS + 2.2
+add_3d_wall(fig, [UTIL_XW, UTIL_XE], [PART_Y - T/2, PART_Y + T/2], [TAB_Z_START, TAB_Z_END], "Kitchen/Bath Partition", "gray")
 
-# Bathroom (east side, north of kitchen, two showers)
-BATH_XW = -1.79
-BATH_XE = R5_XE   # ≈ -3.97 — east edge of Room 5
-BATH_YS = SLAB_Y_NORTH_EDGE + (SLAB_Y_SOUTH_EDGE - SLAB_Y_NORTH_EDGE) * 0.20
-BATH_YE = KITCHEN_YS
+# Kitchen area (simple counter representation)
+add_3d_wall(fig, [UTIL_XW + 0.4, UTIL_XE - 0.4], [UTIL_YS + 0.3, PART_Y - 0.3], [TAB_Z_START + 0.1, TAB_Z_START + 0.9], "Kitchen Counter", KITCHEN_C)
 
-add_3d_wall(fig, [BATH_XW, BATH_XE], [BATH_YS, BATH_YE], [TAB_Z_START, TAB_Z_END], "Bathroom North Wall", BATH_C)
-add_3d_wall(fig, [BATH_XW, BATH_XE], [BATH_YS, BATH_YE], [TAB_Z_START, TAB_Z_START+0.05], "Bathroom Floor", "lightcyan")
-add_3d_wall(fig, [BATH_XE, BATH_XE + T], [BATH_YS, BATH_YE], [TAB_Z_START, TAB_Z_END], "Bathroom East Wall", BATH_C)
-add_3d_wall(fig, [BATH_XW, BATH_XE], [BATH_YE - T, BATH_YE], [TAB_Z_START, TAB_Z_END], "Bathroom South Wall", BATH_C)
+# Bathroom — two showers
+add_3d_wall(fig, [UTIL_XW + 0.4, UTIL_XW + 1.4], [PART_Y + 0.4, PART_Y + 1.8], [TAB_Z_START + 0.1, TAB_Z_START + 2.1], "Shower 1", "teal")
+add_3d_wall(fig, [UTIL_XW + 1.6, UTIL_XW + 2.6], [PART_Y + 0.4, PART_Y + 1.8], [TAB_Z_START + 0.1, TAB_Z_START + 2.1], "Shower 2", "teal")
 
-# Shower divider
-SHOWER_DIV_X = BATH_XW - 1.1
-add_3d_wall(fig, [SHOWER_DIV_X, SHOWER_DIV_X + T], [BATH_YS, BATH_YE], [TAB_Z_START, TAB_Z_END], "Shower Divider", BATH_C)
+# Doors from hallway
+add_3d_wall(fig, [HALL_END_X - T, HALL_END_X], [UTIL_YS + 0.6, UTIL_YS + 1.8], [TAB_Z_START+0.1, TAB_Z_START+2.1], "Kitchen Door", ENT_C)
+add_3d_wall(fig, [HALL_END_X - T, HALL_END_X], [PART_Y + 0.4, PART_Y + 1.6], [TAB_Z_START+0.1, TAB_Z_START+2.1], "Bathroom Door", ENT_C)
 
-add_3d_wall(fig, [BATH_XW, SHOWER_DIV_X], [BATH_YS + 0.8, BATH_YS + 2.0], [TAB_Z_START + 0.1, TAB_Z_START + 2.1], "Shower 1", "teal")
-add_3d_wall(fig, [SHOWER_DIV_X, BATH_XE], [BATH_YS + 0.8, BATH_YS + 2.0], [TAB_Z_START + 0.1, TAB_Z_START + 2.1], "Shower 2", "teal")
-
-add_3d_wall(fig, [HALL_END_X - T, HALL_END_X], [BATH_YS + 1.2, BATH_YS + 2.4], [TAB_Z_START+0.1, TAB_Z_START+2.1], "Bathroom Door", ENT_C)
-
-# --- Stair continuation to first floor ---
+# --- Stair continuation ---
 stair_z_start = TAB_Z_START - 0.3
 curr_z = stair_z_start
 curr_x = -1.1
