@@ -170,7 +170,6 @@ add_3d_wall(fig, [NW_WIN_X_START, NW_WIN_X_END], [R5_YN, R5_YN+T], [NW_WIN_Z_HEA
 add_3d_wall(fig, [NW_WIN_X_END, R5_XE], [R5_YN, R5_YN+T], [R5_Z, R5_CEIL], "R5 N Wall E", R5_C)
 add_3d_wall(fig, [NW_WIN_X_START, NW_WIN_X_END], [R5_YN+T/2, R5_YN+T/2], [NW_WIN_Z_SILL, NW_WIN_Z_HEAD], "Glass R5 N", G_C, G_O)
 
-# Room 5 East Wall
 E_W_Y1, E_W_Y2 = R5_YN + 0.70, R5_YN + 1.68
 E_WIN_Z_SILL, E_WIN_Z_HEAD = R5_Z + 1.22, R5_Z + 1.22 + 0.79
 add_3d_wall(fig, [R5_XE, R5_XE+T], [R5_YN, E_W_Y1], [R5_Z, R5_CEIL], "R5 E Wall N", R5_C)
@@ -179,7 +178,6 @@ add_3d_wall(fig, [R5_XE, R5_XE+T], [E_W_Y1, E_W_Y2], [E_WIN_Z_HEAD, R5_CEIL], "R
 add_3d_wall(fig, [R5_XE, R5_XE+T], [E_W_Y2, R5_YS], [R5_Z, R5_CEIL], "R5 E Wall S", R5_C)
 add_3d_wall(fig, [R5_XE+T/2, R5_XE+T/2], [E_W_Y1, E_W_Y2], [E_WIN_Z_SILL, E_WIN_Z_HEAD], "Glass R5 E", G_C, G_O)
 
-# Room 5 South Wall
 S_W_X1, S_W_X2 = R5_XE + 0.36, R5_XE + 1.26
 S_WIN_Z_SILL, S_WIN_Z_HEAD = R5_Z + 1.31, R5_Z + 1.31 + 0.72
 add_3d_wall(fig, [R5_XW, S_D_X_START], [R5_YS, R5_YS+T], [R5_Z, R5_CEIL], "R5 S Wall W", R5_C)
@@ -244,7 +242,7 @@ HALL_START_X   = 0.00
 HALL_WIDTH     = 2.00
 HALL_END_X     = HALL_START_X + HALL_WIDTH
 
-# FF North Outer matches exactly the length of Room 2's north wall
+# North wall of first floor now matches length of Room 2 north wall
 # Room 2 north wall spans from x = R2_X_END (-1.79) to ~0 (but we extend it full west to WEST_LIMIT_X for consistency)
 FF_NORTH_X_START = R2_X_END     # -1.79
 FF_NORTH_X_END   = WEST_LIMIT_X # 4.84
