@@ -19,7 +19,7 @@ hide_st_style = """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', opacity=0.9):
-    # Force sorted ranges to prevent degenerate/invisible meshes
+    # Force sorted ranges to prevent degenerate meshes
     x_min, x_max = min(x_range), max(x_range)
     y_min, y_max = min(y_range), max(y_range)
     z_min, z_max = min(z_range), max(z_range)
@@ -219,7 +219,7 @@ add_3d_wall(fig,
     "rgba(100,100,100,0.25)"
 )
 
-# Extended slab over Room 5 (now supports first floor further east)
+# Extended slab only above Room 5
 add_3d_wall(fig,
     [R5_XE, SLAB_X_EAST_EDGE],
     [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE],
@@ -228,7 +228,7 @@ add_3d_wall(fig,
     "rgba(100,100,100,0.25)"
 )
 
-# --- 10. FIRST FLOOR (extended east over Room 5) ---
+# --- 10. FIRST FLOOR ---
 
 TAB_Z_START = SLAB_TOP
 TAB_Z_END   = TAB_Z_START + 2.50
@@ -237,15 +237,16 @@ HALL_START_X   = 0.00
 HALL_WIDTH     = 2.00
 HALL_END_X     = HALL_START_X + HALL_WIDTH
 
-FF_EAST_X = R5_XE          # East limit = east edge of Room 5
+# East boundary = eastern edge of Room 5 (nothing beyond this)
+FF_EAST_X = R5_XE          # ≈ -3.97
 
-# Outer walls — extended east
+# Outer walls
 add_3d_wall(fig, [FF_EAST_X, WEST_LIMIT_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_NORTH_EDGE+T], [TAB_Z_START, TAB_Z_END], "FF North Outer", TAB_C)
 add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF West Outer", TAB_C)
 add_3d_wall(fig, [FF_EAST_X, WEST_LIMIT_X], [SLAB_Y_SOUTH_EDGE-T, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF South Outer", TAB_C)
 add_3d_wall(fig, [FF_EAST_X-T, FF_EAST_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF East Outer (over R5)", TAB_C)
 
-# Hallway floor (western part)
+# Hallway floor (western side only)
 add_3d_wall(fig, [HALL_START_X, HALL_END_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_START+0.05], "FF Hallway Floor", "lightgray")
 
 # Four tenant rooms — west of hallway
@@ -266,10 +267,10 @@ for i in range(4):
     door_mid = (ys + ye) / 2
     add_3d_wall(fig, [HALL_START_X - T, HALL_START_X], [door_mid-0.45, door_mid+0.45], [TAB_Z_START+0.1, TAB_Z_START+2.1], f"{room_name} Door", ENT_C)
 
-# Kitchen + Bathroom — placed over Room 5 (eastern extension)
-UTIL_XW = HALL_END_X            # from hallway
-UTIL_XE = FF_EAST_X             # to east edge of Room 5
-UTIL_YS = SLAB_Y_SOUTH_EDGE - 5.5   # southern part (near stairs)
+# Kitchen + Bathroom — only in the area above Room 5 (x < -1.79 → up to R5_XE)
+UTIL_XW = -1.79                 # starts at east edge of Room 2/4
+UTIL_XE = R5_XE                 # ends at east edge of Room 5
+UTIL_YS = SLAB_Y_SOUTH_EDGE - 5.5   # southern part, near stairs
 UTIL_YE = SLAB_Y_SOUTH_EDGE
 
 add_3d_wall(fig, [UTIL_XW, UTIL_XE], [UTIL_YS, UTIL_YE], [TAB_Z_START, TAB_Z_END], "Utility North Wall", "gray")
@@ -277,11 +278,11 @@ add_3d_wall(fig, [UTIL_XW, UTIL_XE], [UTIL_YS, UTIL_YE], [TAB_Z_START, TAB_Z_STA
 add_3d_wall(fig, [UTIL_XE - T, UTIL_XE], [UTIL_YS, UTIL_YE], [TAB_Z_START, TAB_Z_END], "Utility East Wall", TAB_C)
 add_3d_wall(fig, [UTIL_XW, UTIL_XE], [UTIL_YE - T, UTIL_YE], [TAB_Z_START, TAB_Z_END], "Utility South Wall", "gray")
 
-# Partition: kitchen (larger, south) vs bathroom (north)
-PART_Y = UTIL_YS + 3.2
+# Partition: kitchen (south) / bathroom (north)
+PART_Y = UTIL_YS + 3.0
 add_3d_wall(fig, [UTIL_XW, UTIL_XE], [PART_Y - T/2, PART_Y + T/2], [TAB_Z_START, TAB_Z_END], "Kitchen/Bath Partition", "gray")
 
-# Kitchen area
+# Kitchen
 add_3d_wall(fig, [UTIL_XW + 0.5, UTIL_XE - 0.5], [UTIL_YS + 0.4, PART_Y - 0.4], [TAB_Z_START + 0.1, TAB_Z_START + 1.0], "Kitchen Area", KITCHEN_C)
 
 # Bathroom — two showers
