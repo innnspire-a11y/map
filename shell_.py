@@ -36,7 +36,7 @@ def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', 
         name=name
     ))
 
-st.title("Digital Twin: Building (L-Shaped Slab)")
+st.title("Digital Twin: Building (L-Shaped Slab & Split Stairs)")
 
 fig = go.Figure()
 
@@ -55,7 +55,7 @@ ENT_C = "rgba(0, 255, 100, 0.4)"
 KITCHEN_C = "lightsalmon"
 BATH_C = "lightseagreen"
 
-R5_XW, R5_XE = -T, -T - 3.75 # Eastern Edge ~ -3.97
+R5_XW, R5_XE = -T, -T - 3.75 
 R5_Z = 0.45
 R5_CEIL = CEILING_H
 
@@ -131,47 +131,52 @@ add_3d_wall(fig, [R5_XW, R5_XE], [R5_YN, R5_YN+T], [R5_Z, R5_CEIL], "R5 N Wall",
 add_3d_wall(fig, [R5_XE, R5_XE+T], [R5_YN, R5_YS], [R5_Z, R5_CEIL], "R5 E Wall", R5_C)
 add_3d_wall(fig, [R5_XW, R5_XE], [R5_YS, R5_YS+T], [R5_Z, R5_CEIL], "R5 S Wall", R5_C)
 
-# --- 9. STEPS & STAIRCASE ---
+# --- 9. LOWER STAIRCASE (To Z=1.81) ---
 add_3d_wall(fig, [-2.1, -1.1], [5.0, 6.4], [0, 0.45], "Step 2 (R5 Base)", "silver")
-curr_z, curr_x = 0.32, -1.1
-for i, (r, d) in enumerate([(0.19, 0.24), (0.21, 0.4), (0.19, 0.4), (0.18, 0.39), (0.18, 0.39), (0.18, 0.4), (0.18, 0.4), (0.18, 0.415)]):
-    add_3d_wall(fig, [curr_x - d, curr_x], [5.0, 6.4], [0, curr_z + r], f"Stair {i+1}", "silver")
-    curr_z += r
+curr_z, curr_x = 0.45, -1.1
+rise_per_step = (1.81 - 0.45) / 8  # Rise = 0.17 per step
+for i in range(8):
+    d = 0.4
+    add_3d_wall(fig, [curr_x - d, curr_x], [5.0, 6.4], [0, curr_z + rise_per_step], f"Stair {i+1}", "silver")
+    curr_z += rise_per_step
     curr_x -= d
 
-# --- CONCRETE SLAB (MATCHING L-SHAPE PHOTO) ---
-# We split the slab into 3 segments to create a hole over the stairs/landing area.
+# --- MID-LANDING (Meeting point at 1.81) ---
+add_3d_wall(fig, [curr_x - 1.2, curr_x], [4.5, 6.4], [0, 1.81], "Mid-Stair Landing", "silver")
+
+# --- UPPER STAIRCASE (Starting slightly North) ---
+# Starts at 1.81, ends at 2.73 (First Floor Level)
+# Moves from landing area to Room 4 top
+u_curr_z = 1.81
+u_curr_y = 4.5 # Starting slightly North of the lower flight
+u_rise = (SLAB_TOP - 1.81) / 6 # Remaining rise over 6 steps
+u_curr_x = curr_x - 0.5 
+
+for i in range(6):
+    y_step = 0.4
+    add_3d_wall(fig, [u_curr_x - 1.0, u_curr_x], [u_curr_y - y_step, u_curr_y], [0, u_curr_z + u_rise], f"Upper Step {i+1}", "silver")
+    u_curr_z += u_rise
+    u_curr_y -= y_step
+
+# --- CONCRETE SLAB (L-SHAPE) ---
 SLAB_Y_N, SLAB_Y_S = -T, R3_Y_END + T
-
-# 1. Western Slab (Covers Room 1 & Room 3 area)
 add_3d_wall(fig, [0, WEST_LIMIT_X + T], [SLAB_Y_N, SLAB_Y_S], [CEILING_H, SLAB_TOP], "Slab West", "rgba(100,100,100,0.5)")
-
-# 2. Northern Strip (Covers Room 2 and North of Room 4)
 add_3d_wall(fig, [R2_X_END, 0], [SLAB_Y_N, 2.42 + T], [CEILING_H, SLAB_TOP], "Slab North-East", "rgba(100,100,100,0.5)")
-
-# 3. Southern Strip (Covers Room 5)
-# This leaves the center (4.4 < Y < 6.8 and X < 0) HOLLOW for the stairs
 add_3d_wall(fig, [R5_XE, 0], [R5_YN - 0.2, SLAB_Y_S], [CEILING_H, SLAB_TOP], "Slab South-East", "rgba(100,100,100,0.5)")
 
 # --- 10. FIRST FLOOR (Built on top of Slab) ---
 TAB_Z_START, TAB_Z_END = SLAB_TOP, SLAB_TOP + 2.50
-# Outer walls only where slab exists
 add_3d_wall(fig, [R2_X_END, WEST_LIMIT_X], [SLAB_Y_N, SLAB_Y_N+T], [TAB_Z_START, TAB_Z_END], "FF N Wall", TAB_C)
 add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [SLAB_Y_N, SLAB_Y_S], [TAB_Z_START, TAB_Z_END], "FF W Wall", TAB_C)
 add_3d_wall(fig, [R5_XE, WEST_LIMIT_X], [SLAB_Y_S-T, SLAB_Y_S], [TAB_Z_START, TAB_Z_END], "FF S Wall", TAB_C)
 add_3d_wall(fig, [R5_XE-T, R5_XE], [R5_YN, SLAB_Y_S], [TAB_Z_START, TAB_Z_END], "FF E Wall", TAB_C)
 
-# --- Upper Stair Continuation ---
-stair_z_start, curr_z, curr_x = TAB_Z_START - 0.3, TAB_Z_START - 0.3, -1.1
-for i in range(8):
-    add_3d_wall(fig, [curr_x - 0.4, curr_x], [5.0, 6.4], [curr_z, curr_z + 0.18], f"Upper Stair {i+1}", "silver")
-    curr_z += 0.18
-    curr_x -= 0.4
-add_3d_wall(fig, [curr_x - 1.5, curr_x + 0.2], [4.4, 6.8], [TAB_Z_START, TAB_Z_START+0.05], "FF Stair Landing", "silver")
+# --- Top Landing (On top of Room 4) ---
+add_3d_wall(fig, [R2_X_END, 0], [2.42, 5.0], [SLAB_TOP, SLAB_TOP+0.05], "FF Stair Landing Top", "silver")
 
 # --- Final view ---
 fig.update_layout(
-    scene=dict(aspectmode='data', camera=dict(eye=dict(x=-1.5, y=-1.5, z=1.5))),
+    scene=dict(aspectmode='data', camera=dict(eye=dict(x=-2.0, y=-2.0, z=2.0))),
     margin=dict(l=0, r=0, b=0, t=50)
 )
 st.plotly_chart(fig, use_container_width=True)
