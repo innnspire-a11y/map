@@ -36,7 +36,7 @@ def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', 
         name=name
     ))
 
-st.title("Digital Twin: Building (Rooms 1-5 Slab Focus)")
+st.title("Digital Twin: Building (L-Shaped Slab)")
 
 fig = go.Figure()
 
@@ -47,7 +47,7 @@ SLAB_TOP = 2.73
 WEST_LIMIT_X = 4.84
 EAST_LIMIT_X = -4.98
 R3_Y_DIVIDE = 7.72
-R3_Y_END = R3_Y_DIVIDE + 3.35  # ≈ 11.07
+R3_Y_END = R3_Y_DIVIDE + 3.35 
 R1_C, R2_C, R3_C, R4_C, R5_C = "royalblue", "firebrick", "darkgreen", "slategrey", "darkorange"
 TAB_C = "plum"
 G_C, G_O = "skyblue", 0.4
@@ -55,63 +55,123 @@ ENT_C = "rgba(0, 255, 100, 0.4)"
 KITCHEN_C = "lightsalmon"
 BATH_C = "lightseagreen"
 
-# Room 5 dimensions for slab calculation
-R5_XE = -T - 3.75 # Easternmost boundary
+R5_XW, R5_XE = -T, -T - 3.75 # Eastern Edge ~ -3.97
 R5_Z = 0.45
+R5_CEIL = CEILING_H
 
-# --- 1. ROOMS 1-5 MESH GENERATION (Simplified Reference) ---
-# Room 1 Walls
+# --- 1. ROOM 1: MAIN HALL ---
 add_3d_wall(fig, [0, WEST_LIMIT_X], [-T, 0], [0, CEILING_H], "R1 North Wall", R1_C)
-add_3d_wall(fig, [-T, 0], [0, R3_Y_DIVIDE], [0, CEILING_H], "R1/R5 Common Wall", R1_C)
-add_3d_wall(fig, [0, WEST_LIMIT_X], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [0, CEILING_H], "R1 South Divider", R1_C)
+add_3d_wall(fig, [-T, 0], [0, 1.15], [0, CEILING_H], "West Pillar 1", R1_C)
+add_3d_wall(fig, [-T, 0], [1.15, 2.11], [2.06, CEILING_H], "West Door Header 1", R1_C)
+add_3d_wall(fig, [-T/2, -T/2], [1.15, 2.11], [0, 2.06], "Entrance 1 Glass", ENT_C)
+add_3d_wall(fig, [-T, 0], [2.11, 5.20], [0, CEILING_H], "West Mid Wall", R1_C)
+add_3d_wall(fig, [-T, 0], [5.20, 6.01], [2.09, CEILING_H], "West Door Header 2", R1_C)
+add_3d_wall(fig, [-T/2, -T/2], [5.20, 6.01], [0, 2.09], "Entrance 2 Glass", ENT_C)
+add_3d_wall(fig, [-T, 0], [6.01, R3_Y_DIVIDE], [0, CEILING_H], "West Pillar 2", R1_C)
+add_3d_wall(fig, [0, 1.96], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [0, CEILING_H], "R1 South Divider E", R1_C)
+add_3d_wall(fig, [1.96, 2.77], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [2.09, CEILING_H], "R1 South Door Header", R1_C)
+add_3d_wall(fig, [1.96, 2.77], [R3_Y_DIVIDE+T/2, R3_Y_DIVIDE+T/2], [0, 2.09], "Entrance South Glass", ENT_C)
+add_3d_wall(fig, [2.77, WEST_LIMIT_X], [R3_Y_DIVIDE, R3_Y_DIVIDE+T], [0, CEILING_H], "R1 South Divider W", R1_C)
 
-# Room 2 Walls
+# --- 2. HOLLOW PILLARS ---
+P_DEPTH, P_WIDTH = 0.50, 0.63
+SPAN_START, SPAN_END = -T, R3_Y_END + T
+P_X_OUT = WEST_LIMIT_X + P_DEPTH
+gap = ((SPAN_END - SPAN_START) - (4 * P_WIDTH)) / 3
+pillar_starts = [SPAN_START, SPAN_START + P_WIDTH + gap, SPAN_START + 2 * (P_WIDTH + gap) + 0.43, SPAN_END - P_WIDTH]
+for i, y_start in enumerate(pillar_starts):
+    y_end = y_start + P_WIDTH
+    add_3d_wall(fig, [WEST_LIMIT_X, P_X_OUT], [y_start, y_start+0.02], [0, CEILING_H], f"Hollow P{i+1} S", "gray")
+    add_3d_wall(fig, [P_X_OUT-0.02, P_X_OUT], [y_start, y_end], [0, CEILING_H], f"Hollow P{i+1} W", "gray")
+    add_3d_wall(fig, [WEST_LIMIT_X, P_X_OUT], [y_end-0.02, y_end], [0, CEILING_H], f"Hollow P{i+1} N", "gray")
+
+# --- 3. WESTERN COLONNADE ---
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [0, 0.90], [0, CEILING_H], "West Corner Pillar", R1_C)
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [0.90, 2.99], [0, 0.17], "West Curb", R1_C)
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [2.99, 4.53], [0, CEILING_H], "West Mid Pillar", R1_C)
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [7.03, R3_Y_DIVIDE], [0, CEILING_H], "West Corner South", R1_C)
+
+# --- 4. ROOM 2: EAST WING ---
 R2_X_END = -1.79
-add_3d_wall(fig, [R2_X_END, 0], [-T, 0], [0, CEILING_H], "R2 North", R2_C)
+add_3d_wall(fig, [-0.62, 0], [-T, 0], [0, CEILING_H], "R2 N Pillar", R2_C)
+add_3d_wall(fig, [-1.325, -0.62], [-T, 0], [0, 1.46], "R2 N Sill", R2_C)
+add_3d_wall(fig, [-1.325, -0.62], [-T, 0], [2.06, CEILING_H], "R2 N Header", R2_C)
+add_3d_wall(fig, [-1.325, -0.62], [-T/2, -T/2], [1.46, 2.06], "Glass R2 N", G_C, G_O)
+add_3d_wall(fig, [R2_X_END, -1.325], [-T, 0], [0, CEILING_H], "R2 N End", R2_C)
 add_3d_wall(fig, [R2_X_END-T, R2_X_END], [-T, 2.42], [0, CEILING_H], "R2 East Wall", R2_C)
+add_3d_wall(fig, [R2_X_END, 0], [2.42, 2.42+T], [0, CEILING_H], "R2 South Shared Wall", R2_C)
 
-# Room 3 Walls
-add_3d_wall(fig, [0, WEST_LIMIT_X], [R3_Y_END, R3_Y_END+T], [0, CEILING_H], "R3 South Wall", R3_C)
+# --- 5. ROOM 3: SOUTH WING ---
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [R3_Y_DIVIDE+0.72, R3_Y_DIVIDE+2.71], [0, 0.86], "R3 W Sill", R3_C)
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [R3_Y_DIVIDE+0.72, R3_Y_DIVIDE+2.71], [2.46, CEILING_H], "R3 W Header", R3_C)
+add_3d_wall(fig, [WEST_LIMIT_X+T/2, WEST_LIMIT_X+T/2], [R3_Y_DIVIDE+0.72, R3_Y_DIVIDE+2.71], [0.86, 2.46], "Glass R3 W", G_C, G_O)
+W_END_X_R3, W_START_X_R3 = WEST_LIMIT_X - 0.35, WEST_LIMIT_X - 1.88
+add_3d_wall(fig, [W_START_X_R3, W_END_X_R3], [R3_Y_END, R3_Y_END+T], [0, 0.43], "R3 S Sill", R3_C)
+add_3d_wall(fig, [W_START_X_R3, W_END_X_R3], [R3_Y_END, R3_Y_END+T], [2.45, CEILING_H], "R3 S Header", R3_C)
+add_3d_wall(fig, [W_START_X_R3, W_END_X_R3], [R3_Y_END+T/2, R3_Y_END+T/2], [0.43, 2.45], "Glass R3 S", G_C, G_O)
+add_3d_wall(fig, [-T, 0], [R3_Y_DIVIDE, R3_Y_END], [0, CEILING_H], "R3 East Shared Wall", R3_C)
+add_3d_wall(fig, [0, W_START_X_R3], [R3_Y_END, R3_Y_END+T], [0, CEILING_H], "R3 S Wall East", R3_C)
+add_3d_wall(fig, [W_END_X_R3, WEST_LIMIT_X], [R3_Y_END, R3_Y_END+T], [0, CEILING_H], "R3 S Wall West", R3_C)
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [R3_Y_DIVIDE, R3_Y_DIVIDE+0.72], [0, CEILING_H], "R3 W Wall N", R3_C)
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [R3_Y_DIVIDE+2.71, R3_Y_END], [0, CEILING_H], "R3 W Wall S", R3_C)
 
-# Room 4 (Mezzanine area)
-R4_X_LEFT = R2_X_END
-add_3d_wall(fig, [R4_X_LEFT, 0], [2.42, 5.0], [0.77, 2.5], "R4 Area", R4_C)
+# --- 6. ROOM 4: THE ENCLOSED MEZZANINE ---
+R4_X_LEFT, R4_Y_TOP, R4_FLOOR, R4_Y_BOTTOM_EDGE = R2_X_END, 2.42, 0.77, 5.0
+add_3d_wall(fig, [R4_X_LEFT, 0], [R4_Y_TOP, R4_Y_BOTTOM_EDGE], [R4_FLOOR, R4_FLOOR+0.05], "R4 Floor", R4_C)
+add_3d_wall(fig, [R4_X_LEFT, 0], [R4_Y_TOP, R4_Y_TOP+T], [R4_FLOOR, 2.5], "R4 North Shared Wall", R4_C)
+add_3d_wall(fig, [-T, 0], [R4_Y_TOP, R4_Y_BOTTOM_EDGE], [R4_FLOOR, 2.5], "R4 West Shared Wall", R4_C)
+add_3d_wall(fig, [R4_X_LEFT-T, R4_X_LEFT], [R4_Y_TOP, R4_Y_BOTTOM_EDGE], [R4_FLOOR, 2.5], "R4 East Wall", R4_C)
+add_3d_wall(fig, [R4_X_LEFT + 0.82, 0], [R4_Y_BOTTOM_EDGE - T, R4_Y_BOTTOM_EDGE], [R4_FLOOR, 2.5], "R4 South Wall", R4_C)
+add_3d_wall(fig, [R4_X_LEFT, R4_X_LEFT + 0.82], [R4_Y_BOTTOM_EDGE - T/2, R4_Y_BOTTOM_EDGE - T/2], [R4_FLOOR, 2.5], "R4 Entrance Glass", ENT_C)
 
-# Room 5 (The Hub)
+# --- 7. ROOM 5: THE HUB ---
 R5_YN, R5_YS = 6.46, R3_Y_END
-add_3d_wall(fig, [-T, R5_XE], [R5_YN, R5_YS], [R5_Z, CEILING_H], "Room 5", R5_C)
+add_3d_wall(fig, [-T, R5_XE], [R5_YN, R5_YS], [R5_Z-0.05, R5_Z], "R5 Floor", "tan")
+add_3d_wall(fig, [R5_XW, R5_XE], [R5_YN, R5_YN+T], [R5_Z, R5_CEIL], "R5 N Wall", R5_C)
+add_3d_wall(fig, [R5_XE, R5_XE+T], [R5_YN, R5_YS], [R5_Z, R5_CEIL], "R5 E Wall", R5_C)
+add_3d_wall(fig, [R5_XW, R5_XE], [R5_YS, R5_YS+T], [R5_Z, R5_CEIL], "R5 S Wall", R5_C)
 
-# --- THE CONCRETE SLAB (Enforced over Rooms 1, 2, 3, 4 & 5 only) ---
-# The slab needs to cover the rectangular bounding box of all ground rooms.
-# X-range: From R5's Eastern Edge (R5_XE) to R1's Western Edge (WEST_LIMIT_X + T)
-# Y-range: From the Northernmost wall (-T) to the Southernmost wall (R3_Y_END + T)
+# --- 9. STEPS & STAIRCASE ---
+add_3d_wall(fig, [-2.1, -1.1], [5.0, 6.4], [0, 0.45], "Step 2 (R5 Base)", "silver")
+curr_z, curr_x = 0.32, -1.1
+for i, (r, d) in enumerate([(0.19, 0.24), (0.21, 0.4), (0.19, 0.4), (0.18, 0.39), (0.18, 0.39), (0.18, 0.4), (0.18, 0.4), (0.18, 0.415)]):
+    add_3d_wall(fig, [curr_x - d, curr_x], [5.0, 6.4], [0, curr_z + r], f"Stair {i+1}", "silver")
+    curr_z += r
+    curr_x -= d
 
-add_3d_wall(fig,
-    [R5_XE, WEST_LIMIT_X + T], 
-    [-T, R3_Y_END + T], 
-    [CEILING_H, SLAB_TOP],
-    "Concrete Slab (Rooms 1-5)",
-    "rgba(80, 80, 80, 0.4)" # Semi-transparent grey
-)
+# --- CONCRETE SLAB (MATCHING L-SHAPE PHOTO) ---
+# We split the slab into 3 segments to create a hole over the stairs/landing area.
+SLAB_Y_N, SLAB_Y_S = -T, R3_Y_END + T
 
-# --- FIRST FLOOR TENANT SPACES (Built atop the slab) ---
-TAB_Z_START = SLAB_TOP
-TAB_Z_END = TAB_Z_START + 2.50
+# 1. Western Slab (Covers Room 1 & Room 3 area)
+add_3d_wall(fig, [0, WEST_LIMIT_X + T], [SLAB_Y_N, SLAB_Y_S], [CEILING_H, SLAB_TOP], "Slab West", "rgba(100,100,100,0.5)")
 
-# Outer boundary of First Floor (must not exceed slab)
-add_3d_wall(fig, [R5_XE, WEST_LIMIT_X + T], [-T, R3_Y_END + T], [TAB_Z_START, TAB_Z_END], "FF Perimeter", TAB_C, opacity=0.3)
+# 2. Northern Strip (Covers Room 2 and North of Room 4)
+add_3d_wall(fig, [R2_X_END, 0], [SLAB_Y_N, 2.42 + T], [CEILING_H, SLAB_TOP], "Slab North-East", "rgba(100,100,100,0.5)")
 
-# --- Final view setup ---
+# 3. Southern Strip (Covers Room 5)
+# This leaves the center (4.4 < Y < 6.8 and X < 0) HOLLOW for the stairs
+add_3d_wall(fig, [R5_XE, 0], [R5_YN - 0.2, SLAB_Y_S], [CEILING_H, SLAB_TOP], "Slab South-East", "rgba(100,100,100,0.5)")
+
+# --- 10. FIRST FLOOR (Built on top of Slab) ---
+TAB_Z_START, TAB_Z_END = SLAB_TOP, SLAB_TOP + 2.50
+# Outer walls only where slab exists
+add_3d_wall(fig, [R2_X_END, WEST_LIMIT_X], [SLAB_Y_N, SLAB_Y_N+T], [TAB_Z_START, TAB_Z_END], "FF N Wall", TAB_C)
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [SLAB_Y_N, SLAB_Y_S], [TAB_Z_START, TAB_Z_END], "FF W Wall", TAB_C)
+add_3d_wall(fig, [R5_XE, WEST_LIMIT_X], [SLAB_Y_S-T, SLAB_Y_S], [TAB_Z_START, TAB_Z_END], "FF S Wall", TAB_C)
+add_3d_wall(fig, [R5_XE-T, R5_XE], [R5_YN, SLAB_Y_S], [TAB_Z_START, TAB_Z_END], "FF E Wall", TAB_C)
+
+# --- Upper Stair Continuation ---
+stair_z_start, curr_z, curr_x = TAB_Z_START - 0.3, TAB_Z_START - 0.3, -1.1
+for i in range(8):
+    add_3d_wall(fig, [curr_x - 0.4, curr_x], [5.0, 6.4], [curr_z, curr_z + 0.18], f"Upper Stair {i+1}", "silver")
+    curr_z += 0.18
+    curr_x -= 0.4
+add_3d_wall(fig, [curr_x - 1.5, curr_x + 0.2], [4.4, 6.8], [TAB_Z_START, TAB_Z_START+0.05], "FF Stair Landing", "silver")
+
+# --- Final view ---
 fig.update_layout(
-    scene=dict(
-        aspectmode='data',
-        xaxis_title="West (-) / East (+)",
-        yaxis_title="North (-) / South (+)",
-        zaxis_title="Height",
-        camera=dict(eye=dict(x=1.8, y=-1.8, z=1.5))
-    ),
-    margin=dict(l=0, r=0, b=0, t=50),
-    title="Structural View: Concrete Slab covering Rooms 1-5"
+    scene=dict(aspectmode='data', camera=dict(eye=dict(x=-1.5, y=-1.5, z=1.5))),
+    margin=dict(l=0, r=0, b=0, t=50)
 )
-
 st.plotly_chart(fig, use_container_width=True)
