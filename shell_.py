@@ -243,7 +243,6 @@ HALL_WIDTH     = 2.00
 HALL_END_X     = HALL_START_X + HALL_WIDTH
 
 # North wall of first floor now matches length of Room 2 north wall
-# Room 2 north wall spans from x = R2_X_END (-1.79) to ~0 (but we extend it full west to WEST_LIMIT_X for consistency)
 FF_NORTH_X_START = R2_X_END     # -1.79
 FF_NORTH_X_END   = WEST_LIMIT_X # 4.84
 
@@ -255,7 +254,7 @@ add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUT
 add_3d_wall(fig, [FF_EAST_X, WEST_LIMIT_X], [SLAB_Y_SOUTH_EDGE-T, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF South Outer", TAB_C)
 add_3d_wall(fig, [FF_EAST_X-T, FF_EAST_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF East Outer (over R5)", TAB_C)
 
-# Perpendicular connection at the eastern end of FF North (touching east wall of Room 2)
+# Perpendicular connection at the eastern end of FF North
 add_3d_wall(fig, [FF_NORTH_X_START - T, FF_NORTH_X_START], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "FF North-East Perpendicular Wall", TAB_C)
 
 # Hallway floor
@@ -279,9 +278,9 @@ for i in range(4):
     door_mid = (ys + ye) / 2
     add_3d_wall(fig, [HALL_START_X - T, HALL_START_X], [door_mid-0.45, door_mid+0.45], [TAB_Z_START+0.1, TAB_Z_START+2.1], f"{room_name} Door", ENT_C)
 
-# Kitchen + Bathroom – only above Room 5 (x from -1.79 to R5_XE)
-UTIL_XW = -1.79
-UTIL_XE = R5_XE
+# Kitchen + utility area ends exactly at Room 5's east wall (R5_XE)
+UTIL_XW = -1.79                 # starts at east edge of Room 2/4
+UTIL_XE = R5_XE                 # ends precisely at Room 5 east wall
 UTIL_YS = SLAB_Y_SOUTH_EDGE - 5.5
 UTIL_YE = SLAB_Y_SOUTH_EDGE
 
@@ -301,7 +300,7 @@ add_3d_wall(fig, [UTIL_XW + 2.5, UTIL_XE - 0.5], [PART_Y + 0.5, PART_Y + 2.5], [
 add_3d_wall(fig, [HALL_END_X - T, HALL_END_X], [UTIL_YS + 1.0, UTIL_YS + 2.5], [TAB_Z_START+0.1, TAB_Z_START+2.1], "Kitchen Door", ENT_C)
 add_3d_wall(fig, [HALL_END_X - T, HALL_END_X], [PART_Y + 0.5, PART_Y + 1.8], [TAB_Z_START+0.1, TAB_Z_START+2.1], "Bathroom Door", ENT_C)
 
-# --- Stair continuation ---
+# --- Stair continuation (unchanged) ---
 stair_z_start = TAB_Z_START - 0.3
 curr_z = stair_z_start
 curr_x = -1.1
