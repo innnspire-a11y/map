@@ -36,7 +36,7 @@ def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', 
         name=name
     ))
 
-st.title("Digital Twin: Building (4-Room Upper Floor with Doors & Windows)")
+st.title("Digital Twin: Building")
 
 fig = go.Figure()
 
@@ -281,4 +281,5 @@ fig.update_layout(
     margin=dict(l=0, r=0, b=0, t=50)
 )
 st.plotly_chart(fig, use_container_width=True)
+
 
