@@ -193,12 +193,13 @@ add_3d_wall(fig, [W_INT_X1, W_INT_X2], [INT_Y3, INT_Y3+0.05], [I_WIN_Z_HEAD, R5_
 add_3d_wall(fig, [W_INT_X2, R5_XE], [INT_Y3, INT_Y3+0.05], [R5_Z, R5_CEIL], "Int Horiz 2", "silver")
 add_3d_wall(fig, [W_INT_X1, W_INT_X2], [INT_Y3+0.025, INT_Y3+0.025], [I_WIN_Z_SILL, I_WIN_Z_HEAD], "Glass Int", G_C, G_O)
 
-# --- 9. STEPS & STAIRCASE ---
+# --- 9. STEPS & STAIRCASE (GROUND LEVEL) ---
 add_3d_wall(fig, [-2.1, -1.1], [5.0, 6.4], [0, 0.45], "Step 2 (R5 Base)", "silver")
 curr_z, curr_x = 0.32, -1.1
 for i, (r, d) in enumerate([(0.19, 0.24), (0.21, 0.4), (0.19, 0.4), (0.18, 0.39), (0.18, 0.39), (0.18, 0.4), (0.18, 0.4), (0.18, 0.415)]):
     add_3d_wall(fig, [curr_x - d, curr_x], [5.0, 6.4], [0, curr_z + r], f"Stair {i+1}", "silver")
-    curr_z += r; curr_x -= d
+    curr_z += r
+    curr_x -= d
 
 # --- CONCRETE SLAB (adjusted: flush N/S/W, no coverage east of ~R2/R4, no slab over stairs) ---
 SLAB_X_EAST_EDGE = -0.8   # just east of R2/R4 zone, before open stair area
@@ -213,21 +214,71 @@ add_3d_wall(fig,
     "rgba(100,100,100,0.25)"
 )
 
-# --- 10. UPPER FLOOR ROOMS (on top of slab - extended over R2, R4, R5 areas) ---
-TAB_Z_START = SLAB_TOP
-TAB_Z_END = TAB_Z_START + 2.50
+# --- 10. FIRST FLOOR (on top of slab) ---
 
-# Outer walls - extended to cover R2/R4/R5 footprint
-add_3d_wall(fig, [SLAB_X_EAST_EDGE, WEST_LIMIT_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_NORTH_EDGE+T], [TAB_Z_START, TAB_Z_END], "Upper North Outer Wall", TAB_C)
-add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "Upper West Outer Wall", TAB_C)
-add_3d_wall(fig, [SLAB_X_EAST_EDGE, WEST_LIMIT_X], [SLAB_Y_SOUTH_EDGE-T, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "Upper South Outer Wall", TAB_C)
-add_3d_wall(fig, [SLAB_X_EAST_EDGE-T, SLAB_X_EAST_EDGE], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "Upper East Outer Wall (over R2/R5)", TAB_C)
+TAB_Z_START = SLAB_TOP          # ≈ 2.73
+TAB_Z_END   = TAB_Z_START + 2.50  # ceiling at ~5.23 m
 
-# Example interior divisions (can be customized further)
-add_3d_wall(fig, [0.5, 0.5+T], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "Upper Main Splitter (N-S)", TAB_C)
-add_3d_wall(fig, [SLAB_X_EAST_EDGE, 1.5], [R4_Y_TOP-0.5, R4_Y_TOP-0.5+T], [TAB_Z_START, TAB_Z_END], "Upper Divider above R4", TAB_C)
-add_3d_wall(fig, [SLAB_X_EAST_EDGE, -1.0], [R5_YN-0.5, R5_YN-0.5+T], [TAB_Z_START + 0.4, TAB_Z_END], "Upper Door Header (example)", TAB_C)
+HALL_START_X   = 0.00           # 4.84 m from west edge
+HALL_WIDTH     = 2.00
+HALL_END_X     = HALL_START_X + HALL_WIDTH
 
+ROOM_WEST_X    = WEST_LIMIT_X   # 4.84
+ROOM_EAST_X    = HALL_START_X   # rooms west of hallway
+
+# East outer wall aligned above Room 2 / Room 4 east face
+EAST_WALL_X    = -1.79          # R2_X_END
+
+# Outer walls of first floor
+add_3d_wall(fig, [EAST_WALL_X, WEST_LIMIT_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_NORTH_EDGE+T], [TAB_Z_START, TAB_Z_END], "First Floor North Outer Wall", TAB_C)
+add_3d_wall(fig, [WEST_LIMIT_X, WEST_LIMIT_X+T], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "First Floor West Outer Wall", TAB_C)
+add_3d_wall(fig, [EAST_WALL_X, WEST_LIMIT_X], [SLAB_Y_SOUTH_EDGE-T, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "First Floor South Outer Wall", TAB_C)
+add_3d_wall(fig, [EAST_WALL_X-T, EAST_WALL_X], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_END], "First Floor East Outer Wall", TAB_C)
+
+# Hallway floor (visual reference)
+add_3d_wall(fig, [HALL_START_X, HALL_START_X + HALL_WIDTH], [SLAB_Y_NORTH_EDGE, SLAB_Y_SOUTH_EDGE], [TAB_Z_START, TAB_Z_START+0.05], "First Floor Hallway Floor", "lightgray")
+
+# Four rooms to the WEST of the hallway (divided roughly equally in y-direction)
+y_dividers = [
+    SLAB_Y_NORTH_EDGE,
+    SLAB_Y_NORTH_EDGE + (SLAB_Y_SOUTH_EDGE - SLAB_Y_NORTH_EDGE)/4,
+    SLAB_Y_NORTH_EDGE + 2*(SLAB_Y_SOUTH_EDGE - SLAB_Y_NORTH_EDGE)/4,
+    SLAB_Y_NORTH_EDGE + 3*(SLAB_Y_SOUTH_EDGE - SLAB_Y_NORTH_EDGE)/4,
+    SLAB_Y_SOUTH_EDGE
+]
+
+room_colors = ["lightblue", "lightgreen", "lightcoral", "lightsalmon"]  # just for reference
+
+for i in range(4):
+    y_start = y_dividers[i]
+    y_end   = y_dividers[i+1]
+    room_name = f"First Floor Room {i+1} (West)"
+    
+    # East wall of each room (facing hallway)
+    add_3d_wall(fig, [HALL_START_X - T, HALL_START_X], [y_start, y_end], [TAB_Z_START, TAB_Z_END], f"{room_name} East Wall", TAB_C)
+    
+    # Partitions between rooms (N-S walls)
+    if i > 0:
+        add_3d_wall(fig, [HALL_START_X, ROOM_WEST_X], [y_start - T/2, y_start + T/2], [TAB_Z_START, TAB_Z_END], f"Partition between Room {i} & {i+1}", TAB_C)
+    
+    # Simple door opening toward hallway (centered)
+    door_y_mid = (y_start + y_end) / 2
+    add_3d_wall(fig, [HALL_START_X - T, HALL_START_X], [door_y_mid-0.4, door_y_mid+0.4], [TAB_Z_START+0.1, TAB_Z_START+2.1], f"Room {i+1} Door Opening", ENT_C)
+
+# --- Staircase continuation to first floor ---
+stair_z_start = TAB_Z_START - 0.3
+curr_z = stair_z_start
+curr_x = -1.1   # continuing from ground stair x progression
+
+for i, (rise, depth) in enumerate([(0.18, 0.40)] * 8):  # 8 steps ≈ +1.44 m → reach above slab
+    add_3d_wall(fig, [curr_x - depth, curr_x], [5.0, 6.4], [curr_z, curr_z + rise + 0.05], f"Upper Stair {i+1}", "silver")
+    curr_z += rise
+    curr_x -= depth
+
+# Final landing at first floor level
+add_3d_wall(fig, [curr_x - 1.5, curr_x + 0.2], [4.4, 6.8], [TAB_Z_START, TAB_Z_START+0.05], "First Floor Stair Landing", "silver")
+
+# --- Final Layout ---
 fig.update_layout(
     scene=dict(
         aspectmode='data',
@@ -237,4 +288,3 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
-
