@@ -243,10 +243,24 @@ for i in range(4):
     add_3d_wall(fig, [WEST_LIMIT_X + T, WEST_LIMIT_X + T + 1.0], [ymin, ymax], [TAB_ZS, TAB_ZS + 0.1], f"Balcony {i+1}", "grey")
     add_3d_wall(fig, [WEST_LIMIT_X + T + 1.0, WEST_LIMIT_X + T + 1.05], [ymin, ymax], [TAB_ZS, TAB_ZS + 1.1], f"Rail {i+1}", "black", 0.5)
 
-add_3d_wall(fig, [R5_XE, 0], [R3_Y_END - 2.0, R3_Y_END], [TAB_ZS, TAB_ZE], "FF Bathroom", BATH_C)
-add_3d_wall(fig, [R5_XE + 1.1, R5_XE + 1.7], [R3_Y_END - 4.4, R3_Y_END - 3.3], [TAB_ZS, TAB_ZS+2.0], "Shower 1", "lightblue", 0.6)
-add_3d_wall(fig, [R5_XE + 1.1, R5_XE + 1.7], [R3_Y_END - 3.2, R3_Y_END - 2.1], [TAB_ZS, TAB_ZS+2.0], "Shower 2", "lightblue", 0.6)
-add_3d_wall(fig, [-4.19, 0], [R3_Y_END - 4.4 - T, R3_Y_END - 4.4], [TAB_ZS, TAB_ZS + 2.0], "FF Showers North Wall", BATH_C)
+# ── Updated bathroom & showers – east edge aligned to R5_XE ≈ -3.97 ────────
+BATH_EAST_X = R5_XE                # ≈ -3.97
+SHOWER_WIDTH = 0.6
+SHOWER_DEPTH = 1.1
+
+add_3d_wall(fig, [BATH_EAST_X, 0], [R3_Y_END - 2.0, R3_Y_END], [TAB_ZS, TAB_ZE], "FF Bathroom", BATH_C)
+
+# Showers moved left so east face = BATH_EAST_X
+shower_east = BATH_EAST_X
+shower_west = shower_east - SHOWER_WIDTH
+
+add_3d_wall(fig, [shower_west, shower_east], [R3_Y_END - 4.4, R3_Y_END - 3.3], [TAB_ZS, TAB_ZS+2.0], "Shower 1", "lightblue", 0.6)
+add_3d_wall(fig, [shower_west, shower_east], [R3_Y_END - 3.2, R3_Y_END - 2.1], [TAB_ZS, TAB_ZS+2.0], "Shower 2", "lightblue", 0.6)
+
+# North wall of showers – adjusted to new east alignment
+add_3d_wall(fig, [shower_west - 0.2, 0], [R3_Y_END - 4.4 - T, R3_Y_END - 4.4], [TAB_ZS, TAB_ZS + 2.0], "FF Showers North Wall", BATH_C)
+
+# Perimeter walls (unchanged, already using R5_XE)
 add_3d_wall(fig, [R2_X_END, WEST_LIMIT_X], [SL_N, SL_N+T], [TAB_ZS, TAB_ZE], "FF North Perimeter", TAB_C_STRONG)
 add_3d_wall(fig, [R5_XE, WEST_LIMIT_X], [SL_S-T, SL_S], [TAB_ZS, TAB_ZE], "FF South Perimeter", TAB_C_STRONG)
 add_3d_wall(fig, [R5_XE-T, R5_XE], [R5_YN, SL_S], [TAB_ZS, TAB_ZE], "FF East Perimeter", TAB_C_STRONG)
@@ -286,3 +300,4 @@ elif page == "Materials & Dimensions":
     # Download option
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button("📥 Download Material List (CSV)", csv, "materials_list.csv", "text/csv")
+
