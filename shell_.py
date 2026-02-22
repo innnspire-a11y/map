@@ -237,30 +237,47 @@ for i in range(4):
     add_3d_wall(fig, [EAST_WALL_X, EAST_WALL_X + T], [door_y_start, door_y_end], [TAB_ZS + 2.1, TAB_ZE], f"FF Door {i+1} Header", TAB_C_STRONG)
     add_3d_wall(fig, [EAST_WALL_X, EAST_WALL_X + T], [door_y_end, ymax], [TAB_ZS, TAB_ZE], f"FF E-Wall {i+1}b", TAB_C_STRONG)
 
-# BALCONIES & BATHS
+# BALCONIES & BATHS ──────────────────────────────────────────────────────────
 for i in range(4):
     ymin, ymax = SL_N + (i * ROOM_W), SL_N + ((i + 1) * ROOM_W)
     add_3d_wall(fig, [WEST_LIMIT_X + T, WEST_LIMIT_X + T + 1.0], [ymin, ymax], [TAB_ZS, TAB_ZS + 0.1], f"Balcony {i+1}", "grey")
     add_3d_wall(fig, [WEST_LIMIT_X + T + 1.0, WEST_LIMIT_X + T + 1.05], [ymin, ymax], [TAB_ZS, TAB_ZS + 1.1], f"Rail {i+1}", "black", 0.5)
 
-# ── Updated bathroom & showers – east edge aligned to R5_XE ≈ -3.97 ────────
-BATH_EAST_X = R5_XE                # ≈ -3.97
-SHOWER_WIDTH = 0.6
-SHOWER_DEPTH = 1.1
+# ── Bathroom block above Hub – strict east limit at R5_XE ≈ -3.97 ──────────
+BATH_EAST = R5_XE               # -3.97
+BATH_WEST = -4.19               # typical west edge from perimeter
+BATH_SOUTH = R3_Y_END - 2.0
+BATH_NORTH = R3_Y_END
 
-add_3d_wall(fig, [BATH_EAST_X, 0], [R3_Y_END - 2.0, R3_Y_END], [TAB_ZS, TAB_ZE], "FF Bathroom", BATH_C)
+add_3d_wall(fig, [BATH_EAST, BATH_WEST], [BATH_SOUTH, BATH_NORTH], [TAB_ZS, TAB_ZE], "FF Bathroom Main Enclosure", BATH_C)
 
-# Showers moved left so east face = BATH_EAST_X
-shower_east = BATH_EAST_X
-shower_west = shower_east - SHOWER_WIDTH
+# Internal partitions (example – four toilets + three showers + vanity)
+# Vertical partitions
+add_3d_wall(fig, [BATH_WEST + 1.0, BATH_EAST], [BATH_NORTH - 2.2, BATH_NORTH - 1.0], [TAB_ZS, TAB_ZE], "Toilet Partition 1", BATH_C)
+add_3d_wall(fig, [BATH_WEST + 2.0, BATH_EAST], [BATH_NORTH - 2.2, BATH_NORTH - 1.0], [TAB_ZS, TAB_ZE], "Toilet Partition 2", BATH_C)
 
-add_3d_wall(fig, [shower_west, shower_east], [R3_Y_END - 4.4, R3_Y_END - 3.3], [TAB_ZS, TAB_ZS+2.0], "Shower 1", "lightblue", 0.6)
-add_3d_wall(fig, [shower_west, shower_east], [R3_Y_END - 3.2, R3_Y_END - 2.1], [TAB_ZS, TAB_ZS+2.0], "Shower 2", "lightblue", 0.6)
+# Shower area walls
+SH_WEST = BATH_WEST + 0.3
+SH_MID1 = SH_WEST + 1.1
+SH_MID2 = SH_MID1 + 1.1
+SH_EAST = BATH_EAST
 
-# North wall of showers – adjusted to new east alignment
-add_3d_wall(fig, [shower_west - 0.2, 0], [R3_Y_END - 4.4 - T, R3_Y_END - 4.4], [TAB_ZS, TAB_ZS + 2.0], "FF Showers North Wall", BATH_C)
+add_3d_wall(fig, [SH_WEST, SH_EAST], [BATH_SOUTH + 0.3, BATH_SOUTH + 1.8], [TAB_ZS, TAB_ZS + 2.0], "Shower North Wall", BATH_C)
+add_3d_wall(fig, [SH_MID1, SH_MID1], [BATH_SOUTH + 0.3, BATH_SOUTH + 1.8], [TAB_ZS, TAB_ZS + 2.0], "Shower Divider 1", "lightblue", 0.5)
+add_3d_wall(fig, [SH_MID2, SH_MID2], [BATH_SOUTH + 0.3, BATH_SOUTH + 1.8], [TAB_ZS, TAB_ZS + 2.0], "Shower Divider 2", "lightblue", 0.5)
 
-# Perimeter walls (unchanged, already using R5_XE)
+# Shower cubicles (three)
+for x_start, name in [(SH_WEST, "Shower 1"), (SH_MID1, "Shower 2"), (SH_MID2, "Shower 3")]:
+    add_3d_wall(fig, [x_start, x_start + 1.1], [BATH_SOUTH + 0.3, BATH_SOUTH + 1.8], [TAB_ZS, TAB_ZS + 2.0], name, "lightblue", 0.6)
+
+# Vanity / sinks area (example double sink)
+add_3d_wall(fig, [BATH_WEST + 0.3, BATH_EAST], [BATH_SOUTH, BATH_SOUTH + 0.8], [TAB_ZS, TAB_ZS + 0.9], "Vanity Cabinet", "sandybrown", 0.4)
+
+# Doors (example – two entry doors from corridor side)
+add_3d_wall(fig, [BATH_EAST - 0.9, BATH_EAST], [BATH_NORTH - 1.5, BATH_NORTH - 0.6], [TAB_ZS, TAB_ZE], "Bathroom Door 1", DOOR_C)
+add_3d_wall(fig, [BATH_EAST - 2.0, BATH_EAST - 1.1], [BATH_NORTH - 1.5, BATH_NORTH - 0.6], [TAB_ZS, TAB_ZE], "Bathroom Door 2", DOOR_C)
+
+# ── Perimeter walls (unchanged) ────────────────────────────────────────────
 add_3d_wall(fig, [R2_X_END, WEST_LIMIT_X], [SL_N, SL_N+T], [TAB_ZS, TAB_ZE], "FF North Perimeter", TAB_C_STRONG)
 add_3d_wall(fig, [R5_XE, WEST_LIMIT_X], [SL_S-T, SL_S], [TAB_ZS, TAB_ZE], "FF South Perimeter", TAB_C_STRONG)
 add_3d_wall(fig, [R5_XE-T, R5_XE], [R5_YN, SL_S], [TAB_ZS, TAB_ZE], "FF East Perimeter", TAB_C_STRONG)
@@ -300,4 +317,5 @@ elif page == "Materials & Dimensions":
     # Download option
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button("📥 Download Material List (CSV)", csv, "materials_list.csv", "text/csv")
+
 
