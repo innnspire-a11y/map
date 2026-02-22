@@ -237,50 +237,55 @@ for i in range(4):
     add_3d_wall(fig, [EAST_WALL_X, EAST_WALL_X + T], [door_y_start, door_y_end], [TAB_ZS + 2.1, TAB_ZE], f"FF Door {i+1} Header", TAB_C_STRONG)
     add_3d_wall(fig, [EAST_WALL_X, EAST_WALL_X + T], [door_y_end, ymax], [TAB_ZS, TAB_ZE], f"FF E-Wall {i+1}b", TAB_C_STRONG)
 
-# BALCONIES & BATHS ──────────────────────────────────────────────────────────
+# ── Bathroom & Facilities Block (Over Room 5) ──────────────────────────────
+# Structural hard-alignment with Room 5 / Pillars
+B_X_EAST = R5_XE          # ~ -3.97
+B_X_WEST = R5_XW          # Aligns with west edge of Hub
+B_Y_SOUTH = R3_Y_END - 3.35 
+B_Y_NORTH = R3_Y_END      # Aligns with Room 5 north wall
+
+# 1. ENCLOSURE & PRIVACY
+add_3d_wall(fig, [B_X_WEST, B_X_EAST], [B_Y_NORTH - T, B_Y_NORTH], [TAB_ZS, TAB_ZE], "BATH North Wall", BATH_C)
+add_3d_wall(fig, [B_X_WEST, B_X_EAST], [B_Y_SOUTH, B_Y_SOUTH + T], [TAB_ZS, TAB_ZE], "BATH South Wall", BATH_C)
+# Privacy screen at entrance (East side)
+add_3d_wall(fig, [B_X_EAST - 1.2, B_X_EAST - T], [B_Y_NORTH - 1.5, B_Y_NORTH - 1.5 + 0.1], [TAB_ZS, TAB_ZE], "BATH Privacy Screen", BATH_C)
+
+# 2. PLUMBING CHASE (Structural wall for pipework)
+CHASE_X = B_X_WEST + 0.6
+add_3d_wall(fig, [CHASE_X, CHASE_X + 0.15], [B_Y_SOUTH, B_Y_NORTH], [TAB_ZS, TAB_ZE], "Plumbing Chase Wall", "grey")
+
+# 3. TOILET ZONE (4 Stalls)
+stall_width = (B_Y_NORTH - B_Y_SOUTH) / 4
 for i in range(4):
-    ymin, ymax = SL_N + (i * ROOM_W), SL_N + ((i + 1) * ROOM_W)
-    add_3d_wall(fig, [WEST_LIMIT_X + T, WEST_LIMIT_X + T + 1.0], [ymin, ymax], [TAB_ZS, TAB_ZS + 0.1], f"Balcony {i+1}", "grey")
-    add_3d_wall(fig, [WEST_LIMIT_X + T + 1.0, WEST_LIMIT_X + T + 1.05], [ymin, ymax], [TAB_ZS, TAB_ZS + 1.1], f"Rail {i+1}", "black", 0.5)
+    y_stall = B_Y_SOUTH + (i * stall_width)
+    # Stall Dividers
+    add_3d_wall(fig, [B_X_WEST + 0.1, CHASE_X], [y_stall, y_stall + 0.05], [TAB_ZS, TAB_ZE], f"Toilet Partition {i+1}", BATH_C, 0.7)
+    # Stall Doors
+    add_3d_wall(fig, [CHASE_X, CHASE_X], [y_stall + 0.2, y_stall + stall_width - 0.2], [TAB_ZS, TAB_ZS + 2.1], f"Stall Door {i+1}", DOOR_C)
 
-# ── Bathroom block above Hub – strict east limit at R5_XE ≈ -3.97 ──────────
-BATH_EAST = R5_XE               # -3.97
-BATH_WEST = -4.19               # typical west edge from perimeter
-BATH_SOUTH = R3_Y_END - 2.0
-BATH_NORTH = R3_Y_END
+# 4. SHOWER ZONE (Aligned over structural span)
+SH_X_START = B_X_EAST - 1.5
+for i in range(3):
+    y_sh = B_Y_SOUTH + (i * 1.1)
+    # Shower cubicles
+    add_3d_wall(fig, [SH_X_START, B_X_EAST - 0.1], [y_sh, y_sh + 0.05], [TAB_ZS, TAB_ZE], f"Shower Partition {i+1}", "lightblue", 0.5)
+    # Glass splash screens
+    add_3d_wall(fig, [SH_X_START + 0.5, SH_X_START + 0.5], [y_sh, y_sh + 1.1], [TAB_ZS, TAB_ZS + 2.0], f"Shower Glass {i+1}", G_C, 0.3)
 
-add_3d_wall(fig, [BATH_EAST, BATH_WEST], [BATH_SOUTH, BATH_NORTH], [TAB_ZS, TAB_ZE], "FF Bathroom Main Enclosure", BATH_C)
+# 5. VANITY AREA (Central Dry Zone)
+add_3d_wall(fig, [CHASE_X + 0.5, SH_X_START - 0.5], [B_Y_SOUTH + 0.5, B_Y_NORTH - 0.5], [TAB_ZS, TAB_ZS + 0.9], "Long Vanity Counter", "sandybrown")
+add_3d_wall(fig, [CHASE_X + 0.6, SH_X_START - 0.6], [B_Y_SOUTH + 0.5, B_Y_NORTH - 0.5], [TAB_ZS + 0.9, TAB_ZS + 1.8], "Mirror Wall", "aliceblue", 0.4)
 
-# Internal partitions (example – four toilets + three showers + vanity)
-# Vertical partitions
-add_3d_wall(fig, [BATH_WEST + 1.0, BATH_EAST], [BATH_NORTH - 2.2, BATH_NORTH - 1.0], [TAB_ZS, TAB_ZE], "Toilet Partition 1", BATH_C)
-add_3d_wall(fig, [BATH_WEST + 2.0, BATH_EAST], [BATH_NORTH - 2.2, BATH_NORTH - 1.0], [TAB_ZS, TAB_ZE], "Toilet Partition 2", BATH_C)
+# 6. ACCESS & VENTILATION
+# Main Entrance
+add_3d_wall(fig, [B_X_EAST - T, B_X_EAST], [B_Y_NORTH - 1.2, B_Y_NORTH - 0.2], [TAB_ZS, TAB_ZS + 2.1], "BATH Main Entry", DOOR_C)
+# Clerestory Windows (High level for light/ventilation)
+add_3d_wall(fig, [B_X_WEST + 0.5, B_X_EAST - 0.5], [B_Y_NORTH - T/2, B_Y_NORTH - T/2], [TAB_ZE - 0.5, TAB_ZE - 0.1], "BATH High Vent", G_C, G_O)
 
-# Shower area walls
-SH_WEST = BATH_WEST + 0.3
-SH_MID1 = SH_WEST + 1.1
-SH_MID2 = SH_MID1 + 1.1
-SH_EAST = BATH_EAST
-
-add_3d_wall(fig, [SH_WEST, SH_EAST], [BATH_SOUTH + 0.3, BATH_SOUTH + 1.8], [TAB_ZS, TAB_ZS + 2.0], "Shower North Wall", BATH_C)
-add_3d_wall(fig, [SH_MID1, SH_MID1], [BATH_SOUTH + 0.3, BATH_SOUTH + 1.8], [TAB_ZS, TAB_ZS + 2.0], "Shower Divider 1", "lightblue", 0.5)
-add_3d_wall(fig, [SH_MID2, SH_MID2], [BATH_SOUTH + 0.3, BATH_SOUTH + 1.8], [TAB_ZS, TAB_ZS + 2.0], "Shower Divider 2", "lightblue", 0.5)
-
-# Shower cubicles (three)
-for x_start, name in [(SH_WEST, "Shower 1"), (SH_MID1, "Shower 2"), (SH_MID2, "Shower 3")]:
-    add_3d_wall(fig, [x_start, x_start + 1.1], [BATH_SOUTH + 0.3, BATH_SOUTH + 1.8], [TAB_ZS, TAB_ZS + 2.0], name, "lightblue", 0.6)
-
-# Vanity / sinks area (example double sink)
-add_3d_wall(fig, [BATH_WEST + 0.3, BATH_EAST], [BATH_SOUTH, BATH_SOUTH + 0.8], [TAB_ZS, TAB_ZS + 0.9], "Vanity Cabinet", "sandybrown", 0.4)
-
-# Doors (example – two entry doors from corridor side)
-add_3d_wall(fig, [BATH_EAST - 0.9, BATH_EAST], [BATH_NORTH - 1.5, BATH_NORTH - 0.6], [TAB_ZS, TAB_ZE], "Bathroom Door 1", DOOR_C)
-add_3d_wall(fig, [BATH_EAST - 2.0, BATH_EAST - 1.1], [BATH_NORTH - 1.5, BATH_NORTH - 0.6], [TAB_ZS, TAB_ZE], "Bathroom Door 2", DOOR_C)
-
-# ── Perimeter walls (unchanged) ────────────────────────────────────────────
+# ── Updated Perimeter walls to wrap the new block ──────────────────────────
 add_3d_wall(fig, [R2_X_END, WEST_LIMIT_X], [SL_N, SL_N+T], [TAB_ZS, TAB_ZE], "FF North Perimeter", TAB_C_STRONG)
-add_3d_wall(fig, [R5_XE, WEST_LIMIT_X], [SL_S-T, SL_S], [TAB_ZS, TAB_ZE], "FF South Perimeter", TAB_C_STRONG)
-add_3d_wall(fig, [R5_XE-T, R5_XE], [R5_YN, SL_S], [TAB_ZS, TAB_ZE], "FF East Perimeter", TAB_C_STRONG)
+add_3d_wall(fig, [B_X_EAST, WEST_LIMIT_X], [SL_S-T, SL_S], [TAB_ZS, TAB_ZE], "FF South Perimeter", TAB_C_STRONG)
+add_3d_wall(fig, [B_X_EAST-T, B_X_EAST], [B_Y_SOUTH, SL_S], [TAB_ZS, TAB_ZE], "FF East Perimeter", TAB_C_STRONG)
 
 # --- 7. Page Rendering Logic ---
 if page == "Digital Twin Model":
@@ -317,5 +322,6 @@ elif page == "Materials & Dimensions":
     # Download option
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button("📥 Download Material List (CSV)", csv, "materials_list.csv", "text/csv")
+
 
 
