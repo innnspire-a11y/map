@@ -37,13 +37,11 @@ def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', 
     dy = abs(y_max - y_min)
     dz = abs(z_max - z_min)
     
-    # Calculate dimensions
     length = round(max(dx, dy), 2)
     thickness = round(min(dx, dy), 2)
     if thickness == 0: thickness = 0.02 
     height = round(dz, 2)
     
-    # Store for Materials Page
     st.session_state.wall_data[name] = {
         "Length (m)": length, 
         "Height (m)": height, 
@@ -65,7 +63,6 @@ def add_3d_wall(fig, x_range, y_range, z_range, name="Wall", color='firebrick', 
     ))
 
 # --- 6. Constants & Construction Logic ---
-# (Logic remains same to ensure the model is built whenever the app runs)
 T = 0.22
 CEILING_H = 2.50
 SLAB_TOP = 2.73
@@ -149,7 +146,7 @@ add_3d_wall(fig, [R4_X_LEFT + 0.82, R4_X_RIGHT], [R4_Y_BOT - T, R4_Y_BOT], [R4_F
 add_3d_wall(fig, [R4_X_LEFT, R4_X_LEFT + 0.82], [R4_Y_BOT - T + T/2, R4_Y_BOT - T + T/2], [R4_FLOOR, 2.5], "R4 Entrance Glass", ENT_C)
 
 # ROOM 5: THE HUB
-R5_XW, R5_XE, R5_YN, R5_YS, R5_Z, R5_CEIL = -T, -T-3.75, 6.46, R3_Y_END, 0.45, CEILING_H
+R5_XW, R5_XE, R5_YN, R5_YS, R5_Z, R5_CEIL = -T, -3.97, 6.46, R3_Y_END, 0.45, CEILING_H
 add_3d_wall(fig, [R5_XW, R5_XE], [R5_YN, R5_YS], [R5_Z-0.05, R5_Z], "R5 Floor", "tan")
 S_D_X_START, S_D_X_END = R5_XW - 0.49, R5_XW - 0.49 - 0.89
 NW_WIN_Z_SILL, NW_WIN_Z_HEAD = R5_Z + 1.72, R5_Z + 1.72 + 0.29
@@ -165,7 +162,7 @@ add_3d_wall(fig, [NW_X1, NW_X2], [R5_YN+T/2, R5_YN+T/2], [NW_WIN_Z_SILL, NW_WIN_
 E_W_Y1, E_W_Y2, E_SILL, E_HEAD = R5_YN + 0.70, R5_YN + 1.68, R5_Z + 1.22, R5_Z + 2.01
 add_3d_wall(fig, [R5_XE, R5_XE+T], [R5_YN, E_W_Y1], [R5_Z, R5_CEIL], "R5 E Wall N", R5_C)
 add_3d_wall(fig, [R5_XE, R5_XE+T], [E_W_Y1, E_W_Y2], [R5_Z, E_SILL], "R5 E Sill", R5_C)
-add_3d_wall(fig, [R5_XE, R5_XE+T], [E_W_Y1, E_W_Y2], [E_HEAD, R5_CEIL], "R5 E Header", R5_C)
+add_3d_wall(fig, [R5_XE, R5_XE+T], [E_W_Y1, E_W_Y2], [E_SILL, E_HEAD], "R5 E Header", R5_C)
 add_3d_wall(fig, [R5_XE+T/2, R5_XE+T/2], [E_W_Y1, E_W_Y2], [E_SILL, E_HEAD], "Glass R5 E", G_C, G_O)
 add_3d_wall(fig, [R5_XE, R5_XE+T], [E_W_Y2, R5_YS], [R5_Z, R5_CEIL], "R5 E Wall S", R5_C)
 S_X1, S_X2, S_SILL, S_HEAD = R5_XE + 0.36, R5_XE + 1.26, R5_Z + 1.31, R5_Z + 2.03
@@ -216,17 +213,51 @@ for i in range(4):
     y_pos = SL_N + i * ROOM_W
     add_3d_wall(fig, [WEST_LIMIT_X - 3.5, WEST_LIMIT_X], [y_pos, y_pos + T], [TAB_ZS, TAB_ZE], f"FF Divider {i+1}", TAB_C_STRONG)
 
-# KITCHEN
-K_XW, K_XE, K_YN, K_YS = 0.0, -2.0, 5.0, -0.22
+# --- UPDATED SERVICE CORE ALIGNMENT (Stacked over Ground Floor x=0) ---
+
+# 1. FF EXTRA WALL (Stacked over Ground Floor x=0)
+add_3d_wall(fig, [-0.22, -0.22 + T], [5.0, 6.45], [TAB_ZS, TAB_ZE], "FF Extra Wall Aligned", TAB_C)
+
+# 2. KITCHEN (East side aligned to x=0)
+K_XW, K_XE, K_YN, K_YS = 0.0, -2.0, 5.0, -0.22 
 OP_S, OP_E = 3.38, 4.78
 add_3d_wall(fig, [K_XE, K_XW], [K_YN - T, K_YN], [TAB_ZS, TAB_ZE], "FF Kitchen South Wall", KITCHEN_C)
 add_3d_wall(fig, [K_XW - T, K_XW], [K_YS, OP_S], [TAB_ZS, TAB_ZE], "FF Kitchen East-South", KITCHEN_C)
 add_3d_wall(fig, [K_XW - T, K_XW], [OP_E, K_YN], [TAB_ZS, TAB_ZE], "FF Kitchen East-North", KITCHEN_C)
 add_3d_wall(fig, [K_XE, K_XE + T], [K_YS, OP_S], [TAB_ZS, TAB_ZE], "FF Kitchen West-South", KITCHEN_C)
 add_3d_wall(fig, [K_XE, K_XE + T], [OP_E, K_YN], [TAB_ZS, TAB_ZE], "FF Kitchen West-North", KITCHEN_C)
-add_3d_wall(fig, [0.0, 0.0 + T], [5.0, 6.45], [TAB_ZS, TAB_ZE], "FF Extra Wall x=0", TAB_C)
 
-# ALIGNED EAST DOORS
+# 3. BATHROOM COMPLEX (East wall aligned to x=0)
+BX_0, BX_W, BY_N, BY_S = 0.0, -3.97, 11.29, 6.46 
+
+# External Shell
+add_3d_wall(fig, [BX_W, BX_0], [BY_N - T, BY_N], [TAB_ZS, TAB_ZE], "BATH North Outer Wall", BATH_C)
+add_3d_wall(fig, [BX_W, BX_0], [BY_S, BY_S + T], [TAB_ZS, TAB_ZE], "BATH South Outer Wall", BATH_C)
+add_3d_wall(fig, [BX_W, BX_W + T], [BY_S, BY_N], [TAB_ZS, TAB_ZE], "BATH West Outer Wall", BATH_C)
+add_3d_wall(fig, [BX_0 - T, BX_0], [BY_S, BY_N], [TAB_ZS, TAB_ZE], "BATH East Outer Wall Aligned", BATH_C)
+
+# Central Vanity
+add_3d_wall(fig, [BX_W + 1.0, BX_0 - 1.0], [BY_S + 2.0, BY_S + 2.6], [TAB_ZS, TAB_ZS + 0.9], "BATH Central Vanity", "sandybrown")
+
+# Toilet Area (3 Stalls)
+stall_depth = 1.5
+for i in range(3):
+    y_stall = BY_S + T + (i * 1.1)
+    add_3d_wall(fig, [BX_W + T, BX_W + T + stall_depth], [y_stall, y_stall + 0.05], [TAB_ZS, TAB_ZE], f"WC Stall {i+1} Partition", BATH_C, 0.7)
+    if (i + 1) != 3:
+        add_3d_wall(fig, [BX_W + T + stall_depth, BX_W + T + stall_depth], [y_stall + 0.1, y_stall + 1.0], [TAB_ZS, TAB_ZS + 2.1], f"WC Door {i+1}", DOOR_C)
+
+# Shower Area
+for i in range(3):
+    x_sh = BX_0 - T - (i * 1.2)
+    add_3d_wall(fig, [x_sh, x_sh - 0.05], [BY_N - T - 1.5, BY_N - T], [TAB_ZS, TAB_ZE], f"SH Stall {i+1} Partition", "lightblue", 0.5)
+    add_3d_wall(fig, [x_sh, x_sh - 1.2], [BY_N - T - 1.5, BY_N - T - 1.5], [TAB_ZS, TAB_ZS + 2.0], f"SH Glass {i+1}", G_C, 0.3)
+
+# Entrance & Privacy
+add_3d_wall(fig, [BX_0 - T, BX_0], [BY_S + 0.5, BY_S + 1.5], [TAB_ZS, TAB_ZS + 2.1], "BATH Entrance Door", DOOR_C)
+add_3d_wall(fig, [BX_0 - 1.5, BX_0 - T], [BY_S + 1.8, BY_S + 1.85], [TAB_ZS, TAB_ZE], "BATH Privacy Screen", BATH_C)
+
+# ── Aligned East Doors (Residential Units) ──────────────
 EAST_WALL_X = 1.84
 for i in range(4):
     ymin = SL_N + i * ROOM_W
@@ -237,59 +268,19 @@ for i in range(4):
     add_3d_wall(fig, [EAST_WALL_X, EAST_WALL_X + T], [door_y_start, door_y_end], [TAB_ZS + 2.1, TAB_ZE], f"FF Door {i+1} Header", TAB_C_STRONG)
     add_3d_wall(fig, [EAST_WALL_X, EAST_WALL_X + T], [door_y_end, ymax], [TAB_ZS, TAB_ZE], f"FF E-Wall {i+1}b", TAB_C_STRONG)
 
-# ── Bathroom & Facilities Block (Over Room 5) ──────────────────────────────
-# Structural hard-alignment with Room 5 / Pillars
-B_X_EAST = R5_XE          # ~ -3.97
-B_X_WEST = R5_XW          # Aligns with west edge of Hub
-B_Y_SOUTH = R3_Y_END - 3.35 
-B_Y_NORTH = R3_Y_END      # Aligns with Room 5 north wall
-
-# 1. ENCLOSURE & PRIVACY
-add_3d_wall(fig, [B_X_WEST, B_X_EAST], [B_Y_NORTH - T, B_Y_NORTH], [TAB_ZS, TAB_ZE], "BATH North Wall", BATH_C)
-add_3d_wall(fig, [B_X_WEST, B_X_EAST], [B_Y_SOUTH, B_Y_SOUTH + T], [TAB_ZS, TAB_ZE], "BATH South Wall", BATH_C)
-# Privacy screen at entrance (East side)
-add_3d_wall(fig, [B_X_EAST - 1.2, B_X_EAST - T], [B_Y_NORTH - 1.5, B_Y_NORTH - 1.5 + 0.1], [TAB_ZS, TAB_ZE], "BATH Privacy Screen", BATH_C)
-
-# 2. PLUMBING CHASE (Structural wall for pipework)
-CHASE_X = B_X_WEST + 0.6
-add_3d_wall(fig, [CHASE_X, CHASE_X + 0.15], [B_Y_SOUTH, B_Y_NORTH], [TAB_ZS, TAB_ZE], "Plumbing Chase Wall", "grey")
-
-# 3. TOILET ZONE (4 Stalls)
-stall_width = (B_Y_NORTH - B_Y_SOUTH) / 4
+# ── Perimeters & Balconies ──────────────────────────
 for i in range(4):
-    y_stall = B_Y_SOUTH + (i * stall_width)
-    # Stall Dividers
-    add_3d_wall(fig, [B_X_WEST + 0.1, CHASE_X], [y_stall, y_stall + 0.05], [TAB_ZS, TAB_ZE], f"Toilet Partition {i+1}", BATH_C, 0.7)
-    # Stall Doors
-    add_3d_wall(fig, [CHASE_X, CHASE_X], [y_stall + 0.2, y_stall + stall_width - 0.2], [TAB_ZS, TAB_ZS + 2.1], f"Stall Door {i+1}", DOOR_C)
+    ymin, ymax = SL_N + (i * ROOM_W), SL_N + ((i + 1) * ROOM_W)
+    add_3d_wall(fig, [WEST_LIMIT_X + T, WEST_LIMIT_X + T + 1.0], [ymin, ymax], [TAB_ZS, TAB_ZS + 0.1], f"Balcony {i+1}", "grey")
+    add_3d_wall(fig, [WEST_LIMIT_X + T + 1.0, WEST_LIMIT_X + T + 1.05], [ymin, ymax], [TAB_ZS, TAB_ZS + 1.1], f"Rail {i+1}", "black", 0.5)
 
-# 4. SHOWER ZONE (Aligned over structural span)
-SH_X_START = B_X_EAST - 1.5
-for i in range(3):
-    y_sh = B_Y_SOUTH + (i * 1.1)
-    # Shower cubicles
-    add_3d_wall(fig, [SH_X_START, B_X_EAST - 0.1], [y_sh, y_sh + 0.05], [TAB_ZS, TAB_ZE], f"Shower Partition {i+1}", "lightblue", 0.5)
-    # Glass splash screens
-    add_3d_wall(fig, [SH_X_START + 0.5, SH_X_START + 0.5], [y_sh, y_sh + 1.1], [TAB_ZS, TAB_ZS + 2.0], f"Shower Glass {i+1}", G_C, 0.3)
-
-# 5. VANITY AREA (Central Dry Zone)
-add_3d_wall(fig, [CHASE_X + 0.5, SH_X_START - 0.5], [B_Y_SOUTH + 0.5, B_Y_NORTH - 0.5], [TAB_ZS, TAB_ZS + 0.9], "Long Vanity Counter", "sandybrown")
-add_3d_wall(fig, [CHASE_X + 0.6, SH_X_START - 0.6], [B_Y_SOUTH + 0.5, B_Y_NORTH - 0.5], [TAB_ZS + 0.9, TAB_ZS + 1.8], "Mirror Wall", "aliceblue", 0.4)
-
-# 6. ACCESS & VENTILATION
-# Main Entrance
-add_3d_wall(fig, [B_X_EAST - T, B_X_EAST], [B_Y_NORTH - 1.2, B_Y_NORTH - 0.2], [TAB_ZS, TAB_ZS + 2.1], "BATH Main Entry", DOOR_C)
-# Clerestory Windows (High level for light/ventilation)
-add_3d_wall(fig, [B_X_WEST + 0.5, B_X_EAST - 0.5], [B_Y_NORTH - T/2, B_Y_NORTH - T/2], [TAB_ZE - 0.5, TAB_ZE - 0.1], "BATH High Vent", G_C, G_O)
-
-# ── Updated Perimeter walls to wrap the new block ──────────────────────────
 add_3d_wall(fig, [R2_X_END, WEST_LIMIT_X], [SL_N, SL_N+T], [TAB_ZS, TAB_ZE], "FF North Perimeter", TAB_C_STRONG)
-add_3d_wall(fig, [B_X_EAST, WEST_LIMIT_X], [SL_S-T, SL_S], [TAB_ZS, TAB_ZE], "FF South Perimeter", TAB_C_STRONG)
-add_3d_wall(fig, [B_X_EAST-T, B_X_EAST], [B_Y_SOUTH, SL_S], [TAB_ZS, TAB_ZE], "FF East Perimeter", TAB_C_STRONG)
+add_3d_wall(fig, [BX_W, WEST_LIMIT_X], [SL_S-T, SL_S], [TAB_ZS, TAB_ZE], "FF South Perimeter", TAB_C_STRONG)
+add_3d_wall(fig, [BX_W-T, BX_W], [BY_S, SL_S], [TAB_ZS, TAB_ZE], "FF East Perimeter Hub Side", TAB_C_STRONG)
 
 # --- 7. Page Rendering Logic ---
 if page == "Digital Twin Model":
-    st.title("Digital Twin: 3D Visualization")
+    st.title("Digital Twin: Vertical Alignment Applied")
     fig.update_layout(
         scene=dict(aspectmode='data', camera=dict(eye=dict(x=-2.2, y=-2.2, z=2.5))),
         margin=dict(l=0, r=0, b=0, t=50)
@@ -298,30 +289,19 @@ if page == "Digital Twin Model":
 
 elif page == "Materials & Dimensions":
     st.title("🧱 Materials & Wall Dimensions")
-    st.write("Every component in the 3D model is indexed here with its calculated dimensions.")
-    
-    # Convert session state dictionary to DataFrame
     df = pd.DataFrame.from_dict(st.session_state.wall_data, orient='index')
     df.index.name = 'Component Name'
     df.reset_index(inplace=True)
     
-    # Search functionality
-    search_query = st.text_input("🔍 Search for a specific wall or component (e.g., 'Kitchen', 'R1', 'Glass')")
+    search_query = st.text_input("🔍 Search for a component")
     if search_query:
         df = df[df['Component Name'].str.contains(search_query, case=False)]
     
-    # Display Metrics
     col1, col2, col3 = st.columns(3)
     col1.metric("Total Components", len(df))
-    col2.metric("Total Wall Surface Area", f"{df['Area (m²)'].sum():.2f} m²")
-    col3.metric("Avg Wall Height", f"{df['Height (m)'].mean():.2f} m")
+    col2.metric("Surface Area", f"{df['Area (m²)'].sum():.2f} m²")
+    col3.metric("Avg Height", f"{df['Height (m)'].mean():.2f} m")
     
-    # Display Table
     st.dataframe(df, use_container_width=True, height=600)
-    
-    # Download option
     csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button("📥 Download Material List (CSV)", csv, "materials_list.csv", "text/csv")
-
-
-
+    st.download_button("📥 Download CSV", csv, "materials.csv", "text/csv")
