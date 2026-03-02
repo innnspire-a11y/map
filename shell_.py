@@ -230,16 +230,43 @@ add_3d_wall(fig, [K_XE, K_XE + T], [OP_E, K_YN], [TAB_ZS, TAB_ZE], "FF Kitchen W
 # 3. BATHROOM COMPLEX (East wall aligned to x=0)
 BX_0, BX_W, BY_N, BY_S = 0.0, -3.97, 11.29, 6.46 
 
-# External Shell
-add_3d_wall(fig, [BX_W, BX_0], [BY_N - T, BY_N], [TAB_ZS, TAB_ZE], "BATH North Outer Wall", BATH_C)
-add_3d_wall(fig, [BX_W, BX_0], [BY_S, BY_S + T], [TAB_ZS, TAB_ZE], "BATH South Outer Wall", BATH_C)
-add_3d_wall(fig, [BX_W, BX_W + T], [BY_S, BY_N], [TAB_ZS, TAB_ZE], "BATH West Outer Wall", BATH_C)
-add_3d_wall(fig, [BX_0 - T, BX_0], [BY_S, BY_N], [TAB_ZS, TAB_ZE], "BATH East Outer Wall Aligned", BATH_C)
+# ── External Shell (original + reinforced clarity) ───────────────────────────
+add_3d_wall(fig, [BX_W, BX_0],       [BY_N - T, BY_N],     [TAB_ZS, TAB_ZE], "BATH North Outer Wall",          BATH_C)
+add_3d_wall(fig, [BX_W, BX_0],       [BY_S,     BY_S + T], [TAB_ZS, TAB_ZE], "BATH South Outer Wall",          BATH_C)
+add_3d_wall(fig, [BX_W, BX_W + T],   [BY_S,     BY_N],     [TAB_ZS, TAB_ZE], "BATH West Outer Wall",           BATH_C)
+add_3d_wall(fig, [BX_0 - T, BX_0],   [BY_S,     BY_N],     [TAB_ZS, TAB_ZE], "BATH East Outer Wall Aligned",   BATH_C)
 
-# Central Vanity
+# ── NEW: Hallway / Passage end closures ──────────────────────────────────────
+# North end wall — closes the passage at the very north
+add_3d_wall(fig, [BX_W, BX_0], [BY_N, BY_N + T], [TAB_ZS, TAB_ZE],
+            "Hall North Closure Wall", C_WALL if 'C_WALL' in globals() else "dimgray")
+
+# South end wall — closes below kitchen / entrance side
+add_3d_wall(fig, [BX_W, BX_0], [BY_S - T, BY_S], [TAB_ZS, TAB_ZE],
+            "Hall South Closure Wall", C_WALL if 'C_WALL' in globals() else "dimgray")
+
+# ── NEW: Windows on EAST façade for hallway daylight (≈1.2–1.4 m wide) ────────
+# Positioned roughly in lower, middle, upper parts of the circulation zone
+win_width  = 1.3
+win_sill   = TAB_ZS + 1.10
+win_height = 1.40
+
+# Window 1 — southern part (near entrance/privacy screen)
+add_3d_wall(fig, [BX_W - T/2, BX_W + T/2], [BY_S + 1.2, BY_S + 1.2 + win_width], [win_sill, win_sill + win_height],
+            "Hall East Window South", G_C, G_O)
+
+# Window 2 — central hallway zone
+add_3d_wall(fig, [BX_W - T/2, BX_W + T/2], [BY_S + 3.0, BY_S + 3.0 + win_width], [win_sill, win_sill + win_height],
+            "Hall East Window Center", G_C, G_O)
+
+# Window 3 — northern part (near showers)
+add_3d_wall(fig, [BX_W - T/2, BX_W + T/2], [BY_N - 2.2, BY_N - 2.2 + win_width], [win_sill, win_sill + win_height],
+            "Hall East Window North", G_C, G_O)
+
+# ── Central Vanity (unchanged) ───────────────────────────────────────────────
 add_3d_wall(fig, [BX_W + 1.0, BX_0 - 1.0], [BY_S + 2.0, BY_S + 2.6], [TAB_ZS, TAB_ZS + 0.9], "BATH Central Vanity", "sandybrown")
 
-# Toilet Area (3 Stalls)
+# Toilet Area (3 Stalls) ──────────────────────────────────────────────────────
 stall_depth = 1.5
 for i in range(3):
     y_stall = BY_S + T + (i * 1.1)
@@ -247,13 +274,13 @@ for i in range(3):
     if (i + 1) != 3:
         add_3d_wall(fig, [BX_W + T + stall_depth, BX_W + T + stall_depth], [y_stall + 0.1, y_stall + 1.0], [TAB_ZS, TAB_ZS + 2.1], f"WC Door {i+1}", DOOR_C)
 
-# Shower Area
+# Shower Area (unchanged) ─────────────────────────────────────────────────────
 for i in range(3):
     x_sh = BX_0 - T - (i * 1.2)
     add_3d_wall(fig, [x_sh, x_sh - 0.05], [BY_N - T - 1.5, BY_N - T], [TAB_ZS, TAB_ZE], f"SH Stall {i+1} Partition", "lightblue", 0.5)
     add_3d_wall(fig, [x_sh, x_sh - 1.2], [BY_N - T - 1.5, BY_N - T - 1.5], [TAB_ZS, TAB_ZS + 2.0], f"SH Glass {i+1}", G_C, 0.3)
 
-# Entrance & Privacy
+# Entrance & Privacy (unchanged) ──────────────────────────────────────────────
 add_3d_wall(fig, [BX_0 - T, BX_0], [BY_S + 0.5, BY_S + 1.5], [TAB_ZS, TAB_ZS + 2.1], "BATH Entrance Door", DOOR_C)
 add_3d_wall(fig, [BX_0 - 1.5, BX_0 - T], [BY_S + 1.8, BY_S + 1.85], [TAB_ZS, TAB_ZE], "BATH Privacy Screen", BATH_C)
 
@@ -305,3 +332,4 @@ elif page == "Materials & Dimensions":
     st.dataframe(df, use_container_width=True, height=600)
     csv = df.to_csv(index=False).encode('utf-8')
     st.download_button("📥 Download CSV", csv, "materials.csv", "text/csv")
+
